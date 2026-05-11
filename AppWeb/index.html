@@ -1721,6 +1721,8 @@
     const componentGroups = document.getElementById("componentGroups");
     const schematicViewport = document.getElementById("schematicViewport");
     const schematicCanvas = document.getElementById("schematicCanvas");
+    const schematicCanvasWidth = 1180;
+    const schematicCanvasHeight = schematicCanvasWidth * (1240 / 1754);
     const stageTitle = document.getElementById("stageTitle");
     const stageTitleIcon = document.getElementById("stageTitleIcon");
     const stageSubtitle = document.getElementById("stageSubtitle");
@@ -1761,12 +1763,13 @@
     };
     const compactViewport = window.matchMedia("(max-width: 760px)").matches;
     const narrowViewport = window.matchMedia("(max-width: 1180px)").matches;
+    const defaultSchematicView = getDefaultSchematicView();
     const view = {
-      scale: compactViewport ? 0.42 : narrowViewport ? 0.58 : 0.78,
-      minScale: compactViewport ? 0.30 : narrowViewport ? 0.38 : 0.48,
-      maxScale: 2.8,
-      panX: 0,
-      panY: compactViewport ? -240 : narrowViewport ? -170 : 8,
+      scale: defaultSchematicView.scale,
+      minScale: defaultSchematicView.minScale,
+      maxScale: defaultSchematicView.maxScale,
+      panX: defaultSchematicView.panX,
+      panY: defaultSchematicView.panY,
       isPanning: false,
       isTouchPanning: false,
       startX: 0,
@@ -1778,6 +1781,33 @@
       touchStartMidX: 0,
       touchStartMidY: 0
     };
+
+    function getDefaultSchematicView() {
+      if (compactViewport) {
+        const viewportWidth = schematicViewport.clientWidth || window.innerWidth;
+        const viewportHeight = schematicViewport.clientHeight || Math.round(window.innerHeight * 0.54);
+        const fitScale = Math.min(
+          (viewportWidth - 24) / schematicCanvasWidth,
+          (viewportHeight - 24) / schematicCanvasHeight
+        );
+
+        return {
+          scale: clamp(fitScale, 0.30, 0.42),
+          minScale: 0.28,
+          maxScale: 2.8,
+          panX: 0,
+          panY: 0
+        };
+      }
+
+      return {
+        scale: narrowViewport ? 0.58 : 0.78,
+        minScale: narrowViewport ? 0.38 : 0.48,
+        maxScale: 2.8,
+        panX: 0,
+        panY: narrowViewport ? -170 : 8
+      };
+    }
 
     function setAccent(color) {
       document.documentElement.style.setProperty("--accent", color);
