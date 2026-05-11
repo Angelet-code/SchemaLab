@@ -1,0 +1,1653 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SchemaLab - Map the signal. Verify the build.</title>
+  <style>
+    :root {
+      --bg: #edf3f4;
+      --panel: rgba(255,255,255,.84);
+      --panel-strong: rgba(255,255,255,.94);
+      --ink: #102033;
+      --muted: #6b7b82;
+      --line: rgba(16,32,51,.12);
+      --teal: #14b89a;
+      --orange: #f39a32;
+      --blue: #2f7fda;
+      --violet: #8366d9;
+      --magenta: #d75a9b;
+      --green: #41a85f;
+      --red: #dc5454;
+      --cyan: #25a6d7;
+      --brown: #b27a24;
+      --shadow: 0 18px 60px rgba(28,49,67,.14);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        linear-gradient(135deg, rgba(237,243,244,.98), rgba(246,249,249,.96));
+      overflow: hidden;
+    }
+
+    button { font: inherit; }
+
+    .app {
+      height: 100vh;
+      display: grid;
+      grid-template-columns: 300px minmax(0, 1fr) 380px;
+      gap: 16px;
+      padding: 16px;
+      background: rgba(255,255,255,.18);
+      backdrop-filter: blur(4px);
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid rgba(255,255,255,.72);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      border-radius: 18px;
+    }
+
+    .sidebar,
+    .inspector {
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .brand {
+      padding: 22px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-mark {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: var(--teal);
+      background: rgba(20,184,154,.11);
+      border: 1px solid rgba(20,184,154,.18);
+    }
+
+    .brand h1 {
+      margin: 0;
+      color: var(--teal);
+      font-size: 22px;
+      letter-spacing: .13em;
+      line-height: 1.1;
+    }
+
+    .brand p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .15em;
+    }
+
+    .block-list {
+      flex: 1;
+      min-height: 0;
+      padding: 12px;
+      overflow: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .block-list::-webkit-scrollbar {
+      display: none;
+    }
+
+    .nav-item {
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--ink);
+      border-radius: 14px;
+      padding: 12px 28px 12px 12px;
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+      cursor: pointer;
+      transition: background .18s ease, border-color .18s ease, transform .18s ease;
+    }
+
+    .nav-item:hover,
+    .nav-item.is-active {
+      background: rgba(255,255,255,.82);
+      border-color: var(--accent);
+      transform: translateX(2px);
+    }
+
+    .nav-item.is-active h2 {
+      color: var(--teal);
+    }
+
+    .selected-ribbon {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 22px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: var(--teal);
+      transform-origin: center;
+      transition: transform .18s ease;
+    }
+
+    .nav-item.is-active:hover .selected-ribbon {
+      transform: scaleY(1.08);
+    }
+
+    .selected-ribbon span {
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+    }
+
+    .dot {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: var(--accent);
+      background: color-mix(in srgb, var(--accent), transparent 87%);
+      border: 1px solid color-mix(in srgb, var(--accent), transparent 72%);
+      font-weight: 800;
+    }
+
+    .nav-item h2 {
+      margin: 0;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .nav-item p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .progress {
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .profile-card {
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .profile-main {
+      flex: 1 1 auto;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: var(--teal);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: .04em;
+      background: linear-gradient(135deg, rgba(255,255,255,.88), rgba(20,184,154,.14));
+      border: 2px solid rgba(255,255,255,.9);
+      box-shadow: 0 8px 22px rgba(28,49,67,.13);
+    }
+
+    .profile-card h3 {
+      margin: 0;
+      font-size: 14px;
+      letter-spacing: .04em;
+    }
+
+    .implementation-progress {
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .progress-track {
+      width: 56px;
+      height: 4px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(16,32,51,.12);
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 85%;
+      border-radius: inherit;
+      background: var(--orange);
+    }
+
+    .profile-actions {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+    }
+
+    .icon-button {
+      width: 28px;
+      height: 28px;
+      border: 0;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: inherit;
+      background: transparent;
+      cursor: pointer;
+      transition: color .18s ease, background .18s ease;
+    }
+
+    .icon-button:hover {
+      color: var(--ink);
+      background: rgba(16,32,51,.06);
+    }
+
+    .stage {
+      position: relative;
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .stage-header {
+      position: absolute;
+      inset: 0 0 auto 0;
+      z-index: 20;
+      pointer-events: none;
+      padding: 18px 28px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 24px;
+    }
+
+    .stage-title {
+      pointer-events: auto;
+    }
+
+    .stage-title-line {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: var(--teal);
+    }
+
+    .stage-title-icon {
+      width: clamp(26px, 3vw, 38px);
+      height: clamp(26px, 3vw, 38px);
+      flex: 0 0 auto;
+      color: var(--orange);
+      filter: drop-shadow(0 8px 22px rgba(255,255,255,.7));
+    }
+
+    .stage-title-icon svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .stage-title h2 {
+      margin: 0;
+      font-size: clamp(24px, 4vw, 46px);
+      letter-spacing: .18em;
+      color: var(--teal);
+      text-transform: uppercase;
+      line-height: .95;
+      text-shadow: 0 8px 30px rgba(255,255,255,.72);
+    }
+
+    .stage-title p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .revision-card {
+      pointer-events: auto;
+      text-align: right;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .14em;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      background: rgba(255,255,255,.60);
+      padding: 8px 10px;
+      border-radius: 10px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 28px rgba(28,49,67,.08);
+      text-transform: uppercase;
+    }
+
+    .revision-card div {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .revision-card span:first-child { color: rgba(16,32,51,.48); }
+    .revision-card span:last-child { color: var(--teal); }
+
+    .schematic-shell {
+      position: absolute;
+      inset: 96px 0 0;
+      overflow: hidden;
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+      backdrop-filter: none;
+    }
+
+    .center-view {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity .18s ease, transform .18s ease;
+    }
+
+    .center-view.is-active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .schematic-viewport {
+      position: relative;
+      height: 100%;
+      overflow: hidden;
+      cursor: default;
+      user-select: none;
+      touch-action: none;
+    }
+
+    .schematic-viewport.is-panning {
+      cursor: grabbing;
+    }
+
+    .schematic-canvas {
+      position: absolute;
+      left: 50%;
+      top: 48%;
+      width: 1180px;
+      aspect-ratio: 1754 / 1240;
+      transform-origin: center center;
+      will-change: transform;
+    }
+
+    .schematic-canvas img,
+    .schematic-canvas svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .schematic-canvas img {
+      object-fit: contain;
+      filter: contrast(1.08) saturate(.12);
+      box-shadow: 0 22px 70px rgba(28,49,67,.12);
+    }
+
+    .zone {
+      fill: var(--accent);
+      fill-opacity: .14;
+      stroke: var(--accent);
+      stroke-width: 5;
+      rx: 6;
+      cursor: pointer;
+      transition: fill-opacity .16s ease, stroke-width .16s ease, filter .16s ease;
+    }
+
+    .zone:hover,
+    .zone.is-active {
+      fill-opacity: .34;
+      stroke-width: 9;
+      filter: drop-shadow(0 0 12px color-mix(in srgb, var(--accent), transparent 45%));
+    }
+
+    .zone-label {
+      pointer-events: none;
+      fill: #102033;
+      font-size: 34px;
+      font-weight: 800;
+    }
+
+    .badge-bg {
+      pointer-events: none;
+      fill: rgba(255,255,255,.92);
+      stroke: var(--accent);
+      stroke-width: 5;
+    }
+
+    .stage-data-view {
+      position: absolute;
+      inset: 162px 42px 94px;
+      overflow: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .stage-data-view::-webkit-scrollbar {
+      display: none;
+    }
+
+    .stage-data-shell {
+      max-width: 1040px;
+      margin: 0 auto;
+    }
+
+    .component-groups {
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    .component-group-title {
+      margin: 0 14px 8px;
+      color: var(--teal);
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      text-shadow: 0 8px 24px rgba(255,255,255,.76);
+    }
+
+    .stage-table {
+      width: 100%;
+      min-width: 760px;
+      border-collapse: separate;
+      border-spacing: 0 8px;
+      color: var(--ink);
+    }
+
+    .stage-table th {
+      padding: 0 14px 8px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .14em;
+      text-align: left;
+      text-transform: uppercase;
+    }
+
+    .stage-table td {
+      padding: 14px;
+      background: rgba(255,255,255,.70);
+      border-top: 1px solid rgba(255,255,255,.75);
+      border-bottom: 1px solid rgba(16,32,51,.06);
+      font-size: 13px;
+      line-height: 1.4;
+      backdrop-filter: blur(12px);
+    }
+
+    .stage-table td:first-child {
+      border-radius: 12px 0 0 12px;
+      border-left: 1px solid rgba(255,255,255,.75);
+      font-weight: 800;
+    }
+
+    .stage-table td:last-child {
+      border-radius: 0 12px 12px 0;
+      border-right: 1px solid rgba(255,255,255,.75);
+    }
+
+    .shared-note {
+      display: block;
+      margin-top: 6px;
+      color: var(--teal);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .04em;
+    }
+
+    .resistor-value {
+      display: flex;
+      align-items: center;
+    }
+
+    .resistor-readable {
+      font-weight: 800;
+    }
+
+    .resistor-bands {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.76);
+      border: 1px solid rgba(16,32,51,.10);
+      box-shadow: 0 6px 18px rgba(28,49,67,.08);
+    }
+
+    .band {
+      width: 8px;
+      height: 22px;
+      border-radius: 2px;
+      background: var(--band-color);
+      border: 1px solid rgba(16,32,51,.18);
+    }
+
+    .band.gold { border-color: rgba(128,96,16,.35); }
+
+    .resistor-code {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .band-label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .stage-table .status {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      color: var(--status-color);
+      background: color-mix(in srgb, var(--status-color), transparent 88%);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .view-switcher {
+      position: absolute;
+      left: 50%;
+      bottom: 20px;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.78);
+      border: 1px solid rgba(255,255,255,.82);
+      box-shadow: 0 18px 50px rgba(28,49,67,.16);
+      backdrop-filter: blur(18px);
+      transform: translateX(-50%);
+    }
+
+    .view-tab {
+      min-height: 40px;
+      border: 0;
+      border-radius: 999px;
+      padding: 0 18px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--ink);
+      background: transparent;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+      transition: background .18s ease, color .18s ease, box-shadow .18s ease;
+    }
+
+    .view-tab svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .view-tab:hover {
+      background: rgba(16,32,51,.06);
+    }
+
+    .view-tab.is-active {
+      color: #fff;
+      background: var(--teal);
+      box-shadow: 0 10px 24px rgba(20,184,154,.28);
+    }
+
+    .info-card {
+      padding: 22px;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--accent);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .16em;
+      font-weight: 900;
+    }
+
+    .info-card h2 {
+      margin: 0;
+      font-size: 28px;
+      letter-spacing: .02em;
+    }
+
+    .summary {
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 14px;
+      margin: 14px 0 0;
+    }
+
+    .section {
+      padding: 20px;
+    }
+
+    .section h3 {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .16em;
+    }
+
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 8px 1fr;
+      gap: 12px;
+      align-items: start;
+      color: var(--ink);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .row::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      margin-top: 5px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .status-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+      font-size: 13px;
+    }
+
+    .status-item:last-child { border-bottom: 0; }
+    .status-item span:first-child { color: var(--muted); }
+    .status-item span:last-child { font-weight: 800; text-align: right; }
+
+    .warning {
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(220,84,84,.22);
+      background: rgba(220,84,84,.08);
+      color: #7d2525;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 1180px) {
+      body { overflow: auto; }
+      .app {
+        height: auto;
+        min-height: 100vh;
+        grid-template-columns: 1fr;
+      }
+      .sidebar, .inspector { min-height: auto; }
+      .block-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      }
+      .stage { min-height: 70vh; }
+      .schematic-shell { inset: 120px 0 0; }
+      .stage-data-view { inset: 168px 18px 98px; }
+      .view-switcher {
+        max-width: calc(100% - 28px);
+        overflow-x: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+      .view-switcher::-webkit-scrollbar { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="panel brand">
+        <div class="brand-mark">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v18M18 3v18M6 8h12M6 16h12"/><path d="M10 8v8M14 8v8"/></svg>
+        </div>
+        <div>
+          <h1>Schema<br>Lab</h1>
+          <p>Map the signal. Verify the build.</p>
+        </div>
+      </div>
+
+      <nav class="panel block-list" id="blockList" aria-label="Bloques del amplificador"></nav>
+
+      <div class="panel progress">
+        <span>Proyecto vivo</span>
+        <span>v0.1</span>
+      </div>
+    </aside>
+
+    <main class="stage">
+      <header class="stage-header">
+        <div class="stage-title">
+          <div class="stage-title-line">
+            <span class="stage-title-icon" id="stageTitleIcon" aria-hidden="true"></span>
+            <h2 id="stageTitle">Schematic<br>View</h2>
+          </div>
+          <p id="stageSubtitle">Cornford Hurricane / Chillidoggy v6</p>
+        </div>
+        <div class="revision-card" id="metricsCard" aria-label="Datos de la vista actual">
+          <div><span>Author</span> <span>Martin Kidd</span></div>
+          <div><span>Date</span> <span>13/07/01</span></div>
+          <div><span>Revision</span> <span>01/05/2013</span></div>
+        </div>
+      </header>
+
+      <section class="schematic-shell center-view is-active" data-view="schematic">
+        <div class="schematic-viewport" id="schematicViewport" aria-label="Visor del esquema con zoom y desplazamiento">
+          <div class="schematic-canvas" id="schematicCanvas">
+            <img src="assets/schematic-original.jpg" alt="Esquema electrico Cornford Hurricane Chillidoggy version 6" />
+            <svg viewBox="0 0 1754 1240" role="img" aria-label="Zonas interactivas del esquema">
+              <g id="zonesSvg"></g>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <section class="stage-data-view center-view" data-view="components" aria-label="Lista de componentes">
+        <div class="stage-data-shell">
+          <div class="component-groups" id="componentGroups"></div>
+        </div>
+      </section>
+
+      <section class="stage-data-view center-view" data-view="progress" aria-label="Tabla de progreso">
+        <div class="stage-data-shell">
+          <table class="stage-table">
+            <thead>
+              <tr>
+                <th>Area</th>
+                <th>Estado</th>
+                <th>Siguiente accion</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Esquema v6</td><td><span class="status" style="--status-color:var(--green)">Confirmado</span></td><td>Usarlo como referencia principal frente a layouts antiguos.</td></tr>
+              <tr><td>Mapa de bloques</td><td><span class="status" style="--status-color:var(--green)">v1 listo</span></td><td>Refinar zonas interactivas segun vayamos estudiando el circuito.</td></tr>
+              <tr><td>Transformadores reales</td><td><span class="status" style="--status-color:var(--green)">Leidos</span></td><td>Documentar medidas en frio de primarios/secundarios.</td></tr>
+              <tr><td>Transformador alimentacion</td><td><span class="status" style="--status-color:var(--red)">Decision</span></td><td>Comprar PT nuevo o redisenar fuente para 325 V AC.</td></tr>
+              <tr><td>Cadena B+</td><td><span class="status" style="--status-color:var(--red)">Corregir</span></td><td>Montar A - 2k2/3W - B - 10k - C - 1k - D - 10k - E.</td></tr>
+              <tr><td>Mediciones en frio</td><td><span class="status" style="--status-color:var(--orange)">Pendiente</span></td><td>Identificar nodos A, B, C, D y E en el montaje real.</td></tr>
+              <tr><td>Primer encendido</td><td><span class="status" style="--status-color:var(--red)">Bloqueado</span></td><td>Esperar a corregir fuente, masas, zocalos y procedimiento de seguridad.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <nav class="view-switcher" aria-label="Vistas centrales">
+        <button class="view-tab is-active" type="button" data-stage-view="schematic">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><path d="M2.46 12C3.73 7.94 7.52 5 12 5s8.27 2.94 9.54 7c-1.27 4.06-5.06 7-9.54 7s-8.27-2.94-9.54-7Z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+          Schematic View
+        </button>
+        <button class="view-tab" type="button" data-stage-view="components">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+          Lista de componentes
+        </button>
+        <button class="view-tab" type="button" data-stage-view="progress">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 19V5m0 14h16M8 15V9m4 6V7m4 8v-4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+          Tabla de progreso
+        </button>
+      </nav>
+    </main>
+
+    <aside class="inspector">
+      <section class="panel profile-card" aria-label="Implementation progress">
+        <div class="profile-main">
+          <div class="avatar" aria-hidden="true">AD</div>
+          <div>
+            <h3>&Aacute;ngel D&iacute;ez</h3>
+            <div class="implementation-progress">
+              <span>Implementation Progress</span>
+              <div class="progress-track" aria-hidden="true"><div class="progress-fill"></div></div>
+              <span>85%</span>
+            </div>
+          </div>
+        </div>
+        <div class="profile-actions">
+          <button class="icon-button" type="button" aria-label="Notificaciones">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0 1 18 14.158V11a6.002 6.002 0 0 0-4-5.659V5a2 2 0 1 0-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 1 1-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+          </button>
+          <button class="icon-button" type="button" aria-label="Menu">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+          </button>
+        </div>
+      </section>
+      <section class="panel info-card" id="infoCard"></section>
+      <section class="panel section">
+        <h3>Datos reales del proyecto</h3>
+        <div class="status-grid">
+          <div class="status-item"><span>Transformador salida</span><span>Hammond 1750H</span></div>
+          <div class="status-item"><span>Reverb driver</span><span>Hammond 1750A</span></div>
+          <div class="status-item"><span>PT actual</span><span>325 V AC</span></div>
+          <div class="status-item"><span>Ruta preferida</span><span>PT nuevo</span></div>
+        </div>
+      </section>
+      <section class="panel section">
+        <h3>Pendientes criticos</h3>
+        <div class="list">
+          <div class="row">Sustituir o redisenar la fuente por el transformador de alimentacion de 325 V AC.</div>
+          <div class="row">Corregir cadena B+: A - 2k2/3W - B - 10k - C - 1k - D - 10k - E.</div>
+          <div class="row">Verificar nodos y masas en frio antes de cualquier prueba con tension.</div>
+        </div>
+      </section>
+      <section class="warning">
+        Alta tension real esperable: con el PT actual la B+ sin carga puede acercarse a 460 V DC. No alimentar el ampli sin procedimiento de arranque definido.
+      </section>
+    </aside>
+  </div>
+
+  <script>
+    const blocks = [
+      {
+        id: "entrada",
+        n: 1,
+        name: "Entrada",
+        subtitle: "Hi/Lo e impedancia",
+        color: "#2f7fda",
+        rect: [20, 190, 250, 500],
+        badge: [34, 210],
+        summary: "Recibe la senal de guitarra, fija la impedancia de entrada y protege la reja de la primera ECC83 mediante la red de resistencias.",
+        function: [
+          "Los jacks y resistencias de 68k forman la entrada hi/lo y condicionan sensibilidad y ruido.",
+          "La resistencia de 1M referencia la entrada a masa y evita que la reja quede flotante.",
+          "Es el primer punto donde un mal contacto o una masa equivocada puede dejar el ampli mudo."
+        ],
+        signal: [
+          "La senal entra a nivel de instrumento, muy pequena y sensible a ruido.",
+          "Los valores de entrada afectan ataque, brillo y carga vista por las pastillas.",
+          "Cualquier hum aqui se amplifica por todo el previo."
+        ]
+      },
+      {
+        id: "previo",
+        n: 2,
+        name: "Previo principal",
+        subtitle: "Ganancia ECC83",
+        color: "#f39a32",
+        rect: [230, 120, 510, 560],
+        badge: [244, 142],
+        summary: "Tres etapas de ECC83 elevan la senal y construyen el caracter principal de saturacion y respuesta dinamica del amplificador.",
+        function: [
+          "Las resistencias de placa y catodo fijan el punto de trabajo de cada triodo.",
+          "Los condensadores de acoplo separan DC y dejan pasar la senal AC hacia la siguiente etapa.",
+          "Los controles de volumen/gain regulan cuanto se excitan las etapas posteriores."
+        ],
+        signal: [
+          "Aqui aparece la mayor parte del caracter previo: compresion, clipping y contenido armonico.",
+          "Los condensadores de catodo y acoplo determinan cuanto grave pasa y donde se aprieta la senal.",
+          "Un error de alimentacion en los nodos D/E cambia todo el comportamiento del previo."
+        ]
+      },
+      {
+        id: "loop",
+        n: 3,
+        name: "Loop de efectos",
+        subtitle: "Send / Return",
+        color: "#00a08c",
+        rect: [560, 0, 330, 270],
+        badge: [574, 18],
+        summary: "Inserta efectos entre el previo y la parte tonal posterior. Sus jacks normalizados deben cerrar el circuito cuando no hay cables.",
+        function: [
+          "El Send toma senal desde el previo y el Return la devuelve al circuito.",
+          "La normalizacion de los jacks mantiene continuidad sin pedalera conectada.",
+          "Un jack mal cableado puede cortar por completo la ruta de senal."
+        ],
+        signal: [
+          "La senal ya llega amplificada respecto a la guitarra.",
+          "Es un punto excelente para diagnosticar si el previo entrega senal.",
+          "Contactos sucios o masas mal planteadas pueden anadir ruido y perdida de nivel."
+        ]
+      },
+      {
+        id: "tonestack",
+        n: 4,
+        name: "Driver y tonestack",
+        subtitle: "Treble / Bass / Middle",
+        color: "#8366d9",
+        rect: [730, 250, 390, 380],
+        badge: [744, 270],
+        summary: "Una ECC83 ataca la red pasiva de tono. El tonestack recorta y redistribuye graves, medios y agudos antes del master.",
+        function: [
+          "La etapa driver entrega impedancia y nivel adecuados para la red de tono.",
+          "Treble, Bass y Middle interactuan; no son controles independientes perfectos.",
+          "La red pasiva atenua bastante senal, que luego debe recuperarse en las etapas siguientes."
+        ],
+        signal: [
+          "Define el balance tonal final del previo.",
+          "La posicion del control de medios afecta mucho a la sensacion de cuerpo y corte.",
+          "Errores de cableado en potes pueden invertir controles o dejar respuestas extranas."
+        ]
+      },
+      {
+        id: "master",
+        n: 5,
+        name: "Master y mezcla",
+        subtitle: "Nivel hacia potencia",
+        color: "#d75a9b",
+        rect: [980, 410, 260, 310],
+        badge: [994, 430],
+        summary: "Controla cuanto nivel llega al inversor de fase y convive con la zona de mezcla de la reverb.",
+        function: [
+          "Permite ajustar volumen general despues del previo y tonestack.",
+          "La senal de reverb recuperada se mezcla cerca de esta zona segun la lectura del esquema.",
+          "Es un punto sensible para pops, fugas DC o cableados largos ruidosos."
+        ],
+        signal: [
+          "A bajo master, el previo puede saturar sin empujar tanto las EL84.",
+          "A master alto, el inversor y la etapa de potencia reciben mas nivel.",
+          "La sensacion de reverb depende de donde y como se mezcla con la senal seca."
+        ]
+      },
+      {
+        id: "pi",
+        n: 6,
+        name: "Inversor de fase",
+        subtitle: "Phase splitter ECC83",
+        color: "#41a85f",
+        rect: [1140, 300, 270, 430],
+        badge: [1154, 318],
+        summary: "Convierte la senal en dos versiones opuestas para excitar las dos EL84 del push-pull.",
+        function: [
+          "Sus dos salidas alimentan las rejas de control de las EL84 mediante condensadores de acoplo.",
+          "Las resistencias de placa, catodo y referencia definen simetria y headroom.",
+          "Debe verificarse pin a pin porque un error aqui reduce potencia o genera distorsion rara."
+        ],
+        signal: [
+          "Produce dos ondas iguales en amplitud idealmente, pero invertidas 180 grados.",
+          "Puede saturar de forma musical si se le exige nivel.",
+          "La simetria afecta el equilibrio entre limpio, compresion y armonicos."
+        ]
+      },
+      {
+        id: "potencia",
+        n: 7,
+        name: "Potencia EL84",
+        subtitle: "Push-pull + OT",
+        color: "#dc5454",
+        rect: [1330, 270, 370, 470],
+        badge: [1344, 288],
+        summary: "Dos EL84 entregan potencia al transformador de salida Hammond 1750H, que adapta la impedancia al altavoz de 8 ohm.",
+        function: [
+          "El nodo A alimenta el centro del primario del transformador de salida.",
+          "El nodo B alimenta pantallas; catodos comparten resistencia de polarizacion.",
+          "El transformador Hammond 1750H es adecuado: 6600 ohm C.T., 8 ohm, 20 W."
+        ],
+        signal: [
+          "Aporta compresion, pegada y saturacion de potencia.",
+          "El bias por catodo condiciona disipacion y respuesta al ataque.",
+          "Nunca debe probarse con EL84 instaladas sin altavoz o carga ficticia correcta."
+        ]
+      },
+      {
+        id: "reverb",
+        n: 8,
+        name: "Reverb",
+        subtitle: "Driver, tanque y recovery",
+        color: "#25a6d7",
+        rect: [300, 700, 760, 390],
+        badge: [314, 720],
+        summary: "Una rama toma senal del previo, excita el tanque mediante un transformador y recupera la senal reverberada con otra ECC83.",
+        function: [
+          "El Hammond 1750A encaja como transformador driver de reverb.",
+          "El tanque transforma la senal electrica en vibracion mecanica y de vuelta a senal.",
+          "El recovery amplifica una senal muy pequena y por eso es sensible a hum y masas."
+        ],
+        signal: [
+          "Anade cola y profundidad a la senal seca.",
+          "Su nivel y brillo dependen del driver, tanque, recovery y punto de mezcla.",
+          "Masas o cables mal colocados pueden introducir hum notable."
+        ]
+      },
+      {
+        id: "fuente",
+        n: 9,
+        name: "Fuente B+",
+        subtitle: "Rectificacion y filtrado",
+        color: "#b27a24",
+        rect: [890, 760, 700, 330],
+        badge: [904, 780],
+        summary: "Rectifica y filtra la alta tension, distribuyendola por los nodos A, B, C, D y E para alimentar cada bloque.",
+        function: [
+          "La cadena correcta es A - 2k2/3W - B - 10k - C - 1k - D - 10k - E.",
+          "El montaje actual detectado usa A - 4k7 - B - 68k - C - 1k - D - 10k - E y debe corregirse.",
+          "El PT actual de 325 V AC puede generar alrededor de 460 V DC sin carga."
+        ],
+        signal: [
+          "No procesa audio directamente, pero condiciona ruido, headroom, dinamica y estabilidad.",
+          "Mal filtrado o masas incorrectas generan hum.",
+          "Tensiones incorrectas pueden hacer que previo, inversor y potencia trabajen fuera de rango."
+        ]
+      }
+    ];
+
+    const list = document.getElementById("blockList");
+    const zonesSvg = document.getElementById("zonesSvg");
+    const infoCard = document.getElementById("infoCard");
+    const componentGroups = document.getElementById("componentGroups");
+    const schematicViewport = document.getElementById("schematicViewport");
+    const schematicCanvas = document.getElementById("schematicCanvas");
+    const stageTitle = document.getElementById("stageTitle");
+    const stageTitleIcon = document.getElementById("stageTitleIcon");
+    const stageSubtitle = document.getElementById("stageSubtitle");
+    const metricsCard = document.getElementById("metricsCard");
+    const centerViews = document.querySelectorAll("[data-view]");
+    const viewTabs = document.querySelectorAll("[data-stage-view]");
+    let activeId = "previo";
+    let selectedFilter = "all";
+    let currentStageView = "schematic";
+    let componentStats = { count: 0, groups: 0 };
+    const allFilter = {
+      id: "all",
+      n: 0,
+      name: "Todo el circuito",
+      subtitle: "Lista completa",
+      color: "#14b89a"
+    };
+    const stageIcons = {
+      schematic: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7Z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>`,
+      components: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>`,
+      progress: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 19V5m0 14h16M8 15V9m4 6V7m4 8v-4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>`
+    };
+    const stageViewMeta = {
+      schematic: {
+        title: "Schematic<br>View",
+        subtitle: "Cornford Hurricane / Chillidoggy v6"
+      },
+      components: {
+        title: "Lista de<br>componentes",
+        subtitle: "Inventario vivo de piezas, compras y verificaciones"
+      },
+      progress: {
+        title: "Tabla de<br>progreso",
+        subtitle: "Estado de reconstruccion y siguientes acciones"
+      }
+    };
+    const view = {
+      scale: 0.78,
+      minScale: 0.48,
+      maxScale: 2.8,
+      panX: 0,
+      panY: 8,
+      isPanning: false,
+      startX: 0,
+      startY: 0,
+      startPanX: 0,
+      startPanY: 0
+    };
+
+    function setAccent(color) {
+      document.documentElement.style.setProperty("--accent", color);
+    }
+
+    function setStageView(viewName) {
+      const meta = stageViewMeta[viewName] || stageViewMeta.schematic;
+      currentStageView = viewName;
+      centerViews.forEach(view => view.classList.toggle("is-active", view.dataset.view === viewName));
+      viewTabs.forEach(tab => tab.classList.toggle("is-active", tab.dataset.stageView === viewName));
+      stageTitle.innerHTML = meta.title;
+      stageTitleIcon.innerHTML = stageIcons[viewName] || stageIcons.schematic;
+      stageSubtitle.textContent = meta.subtitle;
+      renderMetricsCard();
+    }
+
+    function renderMetricsCard() {
+      if (currentStageView === "components") {
+        metricsCard.innerHTML = `
+          <div><span>Filtro</span> <span>${blockName(selectedFilter)}</span></div>
+          <div><span>Componentes</span> <span>${componentStats.count}</span></div>
+          <div><span>Grupos</span> <span>${componentStats.groups}</span></div>
+        `;
+        return;
+      }
+
+      if (currentStageView === "progress") {
+        metricsCard.innerHTML = `
+          <div><span>Estado</span> <span>En progreso</span></div>
+          <div><span>Criticos</span> <span>3</span></div>
+          <div><span>Revision</span> <span>Web v0.1</span></div>
+        `;
+        return;
+      }
+
+      metricsCard.innerHTML = `
+        <div><span>Author</span> <span>Martin Kidd</span></div>
+        <div><span>Date</span> <span>13/07/01</span></div>
+        <div><span>Revision</span> <span>01/05/2013</span></div>
+      `;
+    }
+
+    function renderList() {
+      list.innerHTML = [allFilter, ...blocks].map(block => `
+        <button class="nav-item ${block.id === selectedFilter ? "is-active" : ""}" style="--accent:${block.color}" data-id="${block.id}">
+          <span class="dot">${block.n}</span>
+          <span>
+            <h2>${block.name}</h2>
+            <p>${block.subtitle}</p>
+          </span>
+          ${block.id === selectedFilter ? `<span class="selected-ribbon" aria-hidden="true"><span>Selected</span></span>` : ""}
+        </button>
+      `).join("");
+    }
+
+    const componentRows = [
+      { block: "entrada", type: "Conector", name: "Jack entrada alta", value: "Jack 6,35 mm conmutado", status: "Verificar", note: "Confirmar contactos de tip/switch y masa." },
+      { block: "entrada", type: "Conector", name: "Jack entrada baja", value: "Jack 6,35 mm conmutado", status: "Verificar", note: "La normalizacion del jack define la entrada hi/lo." },
+      { block: "entrada", type: "Resistencia", name: "Grid stopper entrada 1", value: "68k", status: "Confirmar", note: "Red de entrada hacia la reja de V1A." },
+      { block: "entrada", type: "Resistencia", name: "Grid stopper entrada 2", value: "68k", status: "Confirmar", note: "Segunda rama de la red hi/lo." },
+      { block: "entrada", type: "Resistencia", name: "Referencia entrada", value: "1M", status: "Confirmar", note: "Evita que la reja quede flotante." },
+      { block: "entrada", type: "Resistencia", name: "Referencia jack", value: "68k", status: "Confirmar", note: "Aparece vertical en la red de jacks." },
+
+      { blocks: ["entrada", "previo"], type: "Valvula", name: "V1", value: "ECC83 / 12AX7", status: "Inventariar", note: "Valvula fisica doble: V1A entrada y V1B segunda etapa de ganancia." },
+      { blocks: ["previo", "tonestack"], type: "Valvula", name: "V2", value: "ECC83 / 12AX7", status: "Inventariar", note: "Valvula fisica doble: V2A tercera etapa de previo y V2B driver del tonestack." },
+      { blocks: ["pi", "potencia"], type: "Valvula", name: "V3", value: "ECC83 / 12AX7", status: "Inventariar", note: "Valvula fisica doble usada como inversor de fase; sus salidas atacan las EL84." },
+      { blocks: ["reverb", "master"], type: "Valvula", name: "V4", value: "ECC83 / 12AX7", status: "Inventariar", note: "Valvula fisica doble para driver/recovery de reverb y mezcla hacia la ruta principal." },
+      { block: "potencia", type: "Valvula", name: "EL84 superior", value: "EL84", status: "Inventariar", note: "Una de las dos valvulas de potencia push-pull." },
+      { block: "potencia", type: "Valvula", name: "EL84 inferior", value: "EL84", status: "Inventariar", note: "Segunda valvula de potencia push-pull." },
+
+      { block: "previo", type: "Resistencia", name: "Placa V1A", value: "100k", status: "Confirmar", note: "Alimentada desde nodo E." },
+      { block: "previo", type: "Resistencia", name: "Catodo V1A", value: "1k5", status: "Confirmar", note: "Va a masa." },
+      { block: "previo", type: "Condensador", name: "Bypass catodo V1A", value: "2,2 uF / 100 V", status: "Confirmar", note: "Positivo al catodo." },
+      { block: "previo", type: "Condensador", name: "Estabilidad / brillo V1A", value: "aprox. 220p", status: "Confirmar", note: "Valor leido como aproximado en esquema." },
+      { block: "previo", type: "Condensador", name: "Acoplo V1A", value: "33n", status: "Confirmar", note: "Salida hacia el primer control de volumen." },
+      { block: "previo", type: "Resistencia", name: "Serie tras V1A", value: "100k", status: "Confirmar", note: "Entre acoplo de 33n y Volume R2." },
+      { block: "previo", type: "Potenciometro", name: "Volume R2", value: "100k Log", status: "Confirmar", note: "Marcado como mitad 1/1 en el esquema." },
+      { block: "previo", type: "Resistencia", name: "Entrada V1B R11", value: "68k", status: "Confirmar", note: "Grid stopper hacia pin 2." },
+      { block: "previo", type: "Resistencia", name: "Placa V1B", value: "100k", status: "Confirmar", note: "Alimentada desde nodo E." },
+      { block: "previo", type: "Resistencia", name: "Catodo V1B", value: "1k5", status: "Confirmar", note: "Sin bypass visible en la lectura principal." },
+      { block: "previo", type: "Condensador", name: "Acoplo V1B", value: "4n7 ceramico", status: "Confirmar", note: "Salida hacia R16." },
+      { block: "previo", type: "Potenciometro", name: "Volume R16", value: "100k Log", status: "Confirmar", note: "Marcado como mitad 1/2." },
+      { block: "previo", type: "Resistencia", name: "Entrada V2A", value: "68k", status: "Confirmar", note: "Desde cursor de R16 a reja." },
+      { block: "previo", type: "Resistencia", name: "Placa V2A", value: "220k", status: "Confirmar", note: "Alimentada desde nodo D segun transcripcion." },
+      { block: "previo", type: "Resistencia", name: "Catodo V2A", value: "4k7", status: "Confirmar", note: "Asociada a red con 470k en la lectura del esquema." },
+      { block: "previo", type: "Resistencia", name: "Realimentacion / referencia V2A", value: "470k", status: "Confirmar", note: "Zona marcada como pendiente de confirmar contra layout." },
+      { block: "previo", type: "Condensador", name: "Acoplo V2A", value: "22n", status: "Confirmar", note: "Salida hacia loop/driver posterior." },
+
+      { block: "loop", type: "Conector", name: "Send", value: "Jack 6,35 mm conmutado", status: "Verificar", note: "Debe mantener continuidad con Return si no hay cable." },
+      { block: "loop", type: "Conector", name: "Return", value: "Jack 6,35 mm conmutado", status: "Verificar", note: "Un cableado incorrecto puede dejar el ampli mudo." },
+      { block: "loop", type: "Resistencia", name: "Referencia Return", value: "1M", status: "Confirmar", note: "Pulldown/referencia visible junto al return." },
+      { block: "loop", type: "Cableado", name: "Normalizacion Send-Return", value: "Contacto conmutado", status: "Verificar", note: "Comprobar continuidad sin jack insertado." },
+
+      { block: "tonestack", type: "Resistencia", name: "Entrada driver", value: "68k", status: "Confirmar", note: "Hacia reja del driver de tono." },
+      { block: "tonestack", type: "Resistencia", name: "Placa driver", value: "220k", status: "Confirmar", note: "Alimentada desde nodo D." },
+      { block: "tonestack", type: "Resistencia", name: "Catodo driver", value: "1k5", status: "Confirmar", note: "Va a masa." },
+      { block: "tonestack", type: "Condensador", name: "Entrada tonestack", value: "100n", status: "Confirmar", note: "Rama principal hacia red de tono." },
+      { block: "tonestack", type: "Condensador", name: "Rama medios/graves", value: "33n", status: "Confirmar", note: "Condensador inferior del tonestack." },
+      { block: "tonestack", type: "Condensador", name: "Rama agudos 1", value: "470p", status: "Confirmar", note: "Asociado a Treble." },
+      { block: "tonestack", type: "Condensador", name: "Rama agudos 2", value: "220p", status: "Confirmar", note: "Asociado a Treble." },
+      { block: "tonestack", type: "Potenciometro", name: "Treble", value: "220k Lin", status: "Confirmar", note: "Terminales exactos a revisar contra layout." },
+      { block: "tonestack", type: "Potenciometro", name: "Bass", value: "220k Log", status: "Confirmar", note: "Forma parte de red pasiva interactiva." },
+      { block: "tonestack", type: "Potenciometro", name: "Middle", value: "22k Lin", status: "Confirmar", note: "Rama inferior hacia masa." },
+      { blocks: ["tonestack", "master"], type: "Resistencia", name: "Salida Treble", value: "22k", status: "Confirmar", note: "Entre salida de tono y entrada de master." },
+      { block: "tonestack", type: "Resistencia", name: "Slope / carga tonestack", value: "68k", status: "Confirmar", note: "Valor visible en la red de tono." },
+
+      { block: "master", type: "Potenciometro", name: "Master", value: "220k Log", status: "Confirmar", note: "Control de nivel hacia inversor de fase." },
+      { blocks: ["master", "pi"], type: "Condensador", name: "Acoplo Master-PI", value: "22n", status: "Confirmar", note: "Bloquea DC antes del inversor." },
+      { blocks: ["master", "pi", "reverb"], type: "Resistencia", name: "Mezcla / entrada PI", value: "47k", status: "Confirmar", note: "Zona de mezcla seca/reverb hacia PI." },
+      { blocks: ["master", "pi"], type: "Resistencia", name: "Referencia entrada PI", value: "1M", status: "Confirmar", note: "A masa en la entrada del inversor." },
+      { blocks: ["master", "reverb"], type: "Condensador", name: "Acoplo mezcla", value: "100n", status: "Confirmar", note: "Asociado a la mezcla/reverb segun esquema." },
+
+      { block: "pi", type: "Resistencia", name: "Placa PI superior", value: "100k", status: "Confirmar", note: "Desde nodo C." },
+      { block: "pi", type: "Resistencia", name: "Placa PI inferior", value: "100k", status: "Confirmar", note: "Desde nodo C." },
+      { block: "pi", type: "Resistencia", name: "Catodo PI", value: "1k5", status: "Confirmar", note: "Red comun del inversor." },
+      { block: "pi", type: "Resistencia", name: "Cola PI", value: "47k", status: "Confirmar", note: "Parte de la red de polarizacion del inversor." },
+      { blocks: ["pi", "potencia"], type: "Condensador", name: "Acoplo salida PI superior", value: "33n", status: "Confirmar", note: "Hacia EL84 superior." },
+      { blocks: ["pi", "potencia"], type: "Condensador", name: "Acoplo salida PI inferior", value: "33n", status: "Confirmar", note: "Hacia EL84 inferior." },
+      { blocks: ["pi", "potencia"], type: "Resistencia", name: "Grid stopper EL84 superior", value: "4k7", status: "Confirmar", note: "Cerca de la reja de control." },
+      { blocks: ["pi", "potencia"], type: "Resistencia", name: "Grid stopper EL84 inferior", value: "4k7", status: "Confirmar", note: "Cerca de la reja de control." },
+      { blocks: ["pi", "potencia"], type: "Resistencia", name: "Grid leak EL84 superior", value: "220k", status: "Confirmar", note: "Referencia de reja." },
+      { blocks: ["pi", "potencia"], type: "Resistencia", name: "Grid leak EL84 inferior", value: "220k", status: "Confirmar", note: "Referencia de reja." },
+
+      { block: "potencia", type: "Transformador", name: "OT", value: "Hammond 1750H", status: "Confirmado", note: "6600 ohm C.T., 8 ohm, 20 W." },
+      { block: "potencia", type: "Resistencia", name: "Screen EL84 superior", value: "220 ohm", status: "Confirmar", note: "Desde nodo B a pantalla." },
+      { block: "potencia", type: "Resistencia", name: "Screen EL84 inferior", value: "220 ohm", status: "Confirmar", note: "Desde nodo B a pantalla." },
+      { block: "potencia", type: "Resistencia", name: "Catodo comun EL84", value: "220 ohm", status: "Confirmar", note: "Permite estimar corriente midiendo caida de tension." },
+      { block: "potencia", type: "Condensador", name: "Bypass catodo EL84", value: "100 uF", status: "Confirmar", note: "Positivo al catodo comun." },
+      { block: "potencia", type: "Conector", name: "Salida altavoz", value: "Jack 8 ohm", status: "Verificar", note: "No encender con EL84 sin carga adecuada." },
+
+      { block: "reverb", type: "Resistencia", name: "Entrada reverb R12", value: "aprox. 68k", status: "Confirmar", note: "Toma de senal hacia driver." },
+      { block: "reverb", type: "Resistencia", name: "Catodo driver R35", value: "1k5", status: "Confirmar", note: "Va a masa." },
+      { block: "reverb", type: "Transformador", name: "Tr3", value: "Hammond 1750A", status: "Confirmado", note: "Transformador driver de reverb." },
+      { block: "reverb", type: "Conector", name: "RevSEND", value: "Jack RCA/segun montaje", status: "Verificar", note: "Salida hacia entrada de tanque." },
+      { block: "reverb", type: "Conector", name: "RevRET", value: "Jack RCA/segun montaje", status: "Verificar", note: "Retorno desde tanque." },
+      { block: "reverb", type: "Tanque", name: "Reverb tank", value: "Entrada 10 ohm", status: "Verificar", note: "Confirmar modelo real y polaridad de conexiones." },
+      { block: "reverb", type: "Resistencia", name: "Placa recovery R37", value: "100k", status: "Confirmar", note: "Alimentada desde nodo D." },
+      { block: "reverb", type: "Resistencia", name: "Catodo recovery R36", value: "1k5", status: "Confirmar", note: "Va a masa." },
+      { block: "reverb", type: "Condensador", name: "Bypass recovery C12", value: "2,2 uF / 100 V", status: "Confirmar", note: "Positivo al catodo." },
+      { block: "reverb", type: "Condensador", name: "Acoplo recovery C14", value: "1000p", status: "Confirmar", note: "Hacia control de reverb." },
+      { blocks: ["reverb", "master"], type: "Potenciometro", name: "Reverb R38", value: "22k Lin", status: "Confirmar", note: "Nivel/mix de reverb." },
+      { block: "reverb", type: "Conector", name: "Reverb footswitch", value: "Jack conmutado a masa", status: "Verificar", note: "Control remoto de reverb." },
+
+      { block: "fuente", type: "Conector", name: "IEC", value: "Entrada red 230 V", status: "Verificar", note: "Revisar tierra de seguridad antes de cualquier prueba." },
+      { block: "fuente", type: "Proteccion", name: "Fusible", value: "Valor pendiente", status: "Verificar", note: "Debe dimensionarse para el PT final." },
+      { block: "fuente", type: "Interruptor", name: "Power", value: "Red primaria", status: "Verificar", note: "Cableado de red y aislamiento criticos." },
+      { block: "fuente", type: "Interruptor", name: "Standby", value: "Alta tension", status: "Verificar", note: "Confirmar arquitectura real del montaje." },
+      { block: "fuente", type: "Transformador", name: "PT actual", value: "325 V AC / 130 mA, 6,3 V CT / 3,5 A", status: "Sustituir", note: "No coincide con esquema; ruta preferida: PT nuevo." },
+      { block: "fuente", type: "Transformador", name: "PT objetivo", value: "295 V AC aprox., 6,3 V AC", status: "Comprar", note: "Mantener B+ razonable y margen para electroliticos." },
+      { block: "fuente", type: "Diodo", name: "Puente rectificador", value: "4 x 1N4007", status: "Confirmar", note: "Revisar orientacion de los cuatro diodos." },
+      { block: "fuente", type: "Condensador", name: "C42-C45", value: "Valor ???", status: "Confirmar", note: "Condensadores antiparasitarios del puente." },
+      { blocks: ["fuente", "potencia"], type: "Condensador", name: "Filtro nodo A", value: "47 uF / 450 V", status: "Verificar", note: "Con PT actual podria quedar sin margen suficiente." },
+      { block: "fuente", type: "Resistencia", name: "Caida A-B", value: "2k2 / 3 W", status: "Comprar", note: "Actualmente hay 4k7 montada." },
+      { blocks: ["fuente", "potencia", "reverb"], type: "Condensador", name: "Filtro nodo B", value: "47 uF / 450 V", status: "Verificar", note: "Alimenta pantallas y reverb driver." },
+      { block: "fuente", type: "Resistencia", name: "Caida B-C", value: "10k", status: "Cambiar", note: "Actualmente hay 68k montada." },
+      { blocks: ["fuente", "pi"], type: "Condensador", name: "Filtro nodo C", value: "47 uF / 450 V", status: "Verificar", note: "Alimenta inversor de fase." },
+      { block: "fuente", type: "Resistencia", name: "Caida C-D", value: "1k", status: "Verificar", note: "El usuario cree que ya coincide." },
+      { blocks: ["fuente", "previo", "tonestack", "reverb"], type: "Condensador", name: "Filtro nodo D", value: "47 uF / 450 V", status: "Verificar", note: "Alimenta previo posterior y reverb recovery." },
+      { block: "fuente", type: "Resistencia", name: "Caida D-E", value: "10k", status: "Verificar", note: "El usuario cree que ya coincide." },
+      { blocks: ["fuente", "previo"], type: "Condensador", name: "Filtro nodo E", value: "47 uF / 450 V", status: "Verificar", note: "Alimenta primeras etapas de previo." },
+      { blocks: ["fuente", "previo", "tonestack", "pi", "potencia", "reverb"], type: "Alimentacion", name: "Filamentos", value: "6,3 V AC", status: "Verificar", note: "Confirmar cableado, centro y referencia a masa." }
+    ];
+
+    function renderZones() {
+      zonesSvg.innerHTML = blocks.map(block => {
+        const [x, y, w, h] = block.rect;
+        const [bx, by] = block.badge;
+        return `
+          <g class="zone-group" data-id="${block.id}" style="--accent:${block.color}">
+            <rect class="zone ${block.id === activeId ? "is-active" : ""}" x="${x}" y="${y}" width="${w}" height="${h}" />
+            <circle class="badge-bg" cx="${bx + 20}" cy="${by + 20}" r="20" />
+            <text class="zone-label" x="${bx + 20}" y="${by + 32}" text-anchor="middle">${block.n}</text>
+          </g>
+        `;
+      }).join("");
+    }
+
+    function renderInfo() {
+      const block = blocks.find(item => item.id === activeId);
+      setAccent(block.color);
+      infoCard.style.setProperty("--accent", block.color);
+      infoCard.innerHTML = `
+        <p class="eyebrow">Bloque ${block.n}</p>
+        <h2>${block.name}</h2>
+        <p class="summary">${block.summary}</p>
+        <div class="section" style="padding-left:0;padding-right:0;padding-bottom:0">
+          <h3>Funcion</h3>
+          <div class="list">${block.function.map(item => `<div class="row">${item}</div>`).join("")}</div>
+        </div>
+        <div class="section" style="padding-left:0;padding-right:0;padding-bottom:0">
+          <h3>Efecto en la senal</h3>
+          <div class="list">${block.signal.map(item => `<div class="row">${item}</div>`).join("")}</div>
+        </div>
+      `;
+    }
+
+    function statusColor(status) {
+      const colors = {
+        Confirmado: "var(--green)",
+        Confirmar: "var(--orange)",
+        Verificar: "var(--orange)",
+        Inventariar: "var(--orange)",
+        Comprar: "var(--red)",
+        Cambiar: "var(--red)",
+        Sustituir: "var(--red)"
+      };
+      return colors[status] || "var(--teal)";
+    }
+
+    function blockName(id) {
+      if (id === "all") return allFilter.name;
+      return blocks.find(block => block.id === id)?.name || id;
+    }
+
+    function rowBlockIds(row) {
+      return row.blocks || [row.block];
+    }
+
+    function sharedNote(row) {
+      const ids = rowBlockIds(row);
+      if (ids.length < 2) return "";
+      return `<span class="shared-note">Compartido con: ${ids.map(blockName).join(" / ")}</span>`;
+    }
+
+    const resistorColors = {
+      0: { name: "negro", color: "#1f1f1f" },
+      1: { name: "marron", color: "#7a4a22" },
+      2: { name: "rojo", color: "#c7352f" },
+      3: { name: "naranja", color: "#e98222" },
+      4: { name: "amarillo", color: "#f2d13d" },
+      5: { name: "verde", color: "#2f9d55" },
+      6: { name: "azul", color: "#2f70d0" },
+      7: { name: "violeta", color: "#7b4bc2" },
+      8: { name: "gris", color: "#8d969b" },
+      9: { name: "blanco", color: "#f3f3ec" },
+      gold: { name: "dorado", color: "#c7a13a" }
+    };
+
+    function parseResistance(value) {
+      const raw = value.toLowerCase().replace(",", ".").replace("ohm", "r");
+      const match = raw.match(/(\d+(?:\.\d+)?)(?:\s*([kmg])\s*(\d+)?)?|\b(\d+)r(\d+)?/);
+      if (!match) return null;
+
+      let ohms;
+      if (match[4]) {
+        ohms = Number(`${match[4]}.${match[5] || 0}`);
+      } else {
+        const base = Number(match[1]);
+        const unit = match[2] || "";
+        const trailing = match[3];
+        const joined = trailing ? Number(`${match[1]}.${trailing}`) : base;
+        const multiplier = unit === "m" ? 1000000 : unit === "k" ? 1000 : unit === "g" ? 1000000000 : 1;
+        ohms = joined * multiplier;
+      }
+      return Number.isFinite(ohms) ? ohms : null;
+    }
+
+    function formatOhms(ohms) {
+      if (ohms >= 1000000) return `${Number((ohms / 1000000).toFixed(2)).toString()} MΩ`;
+      if (ohms >= 1000) return `${Number((ohms / 1000).toFixed(2)).toString()} kΩ`;
+      return `${Number(ohms.toFixed(2)).toString()} Ω`;
+    }
+
+    function resistorBands(ohms) {
+      let multiplier = 0;
+      let significant = ohms;
+      while (significant >= 100 && multiplier < 9) {
+        significant /= 10;
+        multiplier += 1;
+      }
+      while (significant < 10 && multiplier > -2) {
+        significant *= 10;
+        multiplier -= 1;
+      }
+
+      const sig = Math.round(significant);
+      const first = Math.floor(sig / 10);
+      const second = sig % 10;
+      if (multiplier < 0 || multiplier > 9 || !resistorColors[first] || !resistorColors[second]) return null;
+      return [first, second, multiplier, "gold"];
+    }
+
+    function resistanceDetails(value) {
+      const ohms = parseResistance(value);
+      if (!ohms) return null;
+      const suffix = value.includes("/") ? ` ${value.slice(value.indexOf("/")).trim()}` : "";
+      const bands = resistorBands(ohms);
+      return { ohms, suffix, bands };
+    }
+
+    function renderResistorValue(value) {
+      const details = resistanceDetails(value);
+      if (!details) return value;
+      return `<span class="resistor-value"><span class="resistor-readable">${formatOhms(details.ohms)}${details.suffix}</span></span>`;
+    }
+
+    function renderResistorCode(value) {
+      const details = resistanceDetails(value);
+      if (!details?.bands) return "";
+      const bands = details.bands;
+      const names = bands.map(band => resistorColors[band].name);
+      const swatches = bands.map(band => {
+        const color = resistorColors[band];
+        return `<span class="band ${band === "gold" ? "gold" : ""}" style="--band-color:${color.color}" title="${color.name}"></span>`;
+      }).join("");
+      return `
+        <span class="resistor-code">
+          <span class="resistor-bands" aria-label="Codigo de colores: ${names.join(", ")}">${swatches}</span>
+          <span class="band-label">${names.join(" - ")}</span>
+        </span>
+      `;
+    }
+
+    function renderComponentValue(row) {
+      return row.type === "Resistencia" ? renderResistorValue(row.value) : row.value;
+    }
+
+    function renderColorCode(row) {
+      return row.type === "Resistencia" ? renderResistorCode(row.value) : "";
+    }
+
+    function renderComponents() {
+      const rows = selectedFilter === "all"
+        ? componentRows
+        : componentRows.filter(row => rowBlockIds(row).includes(selectedFilter));
+      const groupedRows = rows.reduce((groups, row) => {
+        if (!groups[row.type]) groups[row.type] = [];
+        groups[row.type].push(row);
+        return groups;
+      }, {});
+      const typeOrder = [
+        "Valvula",
+        "Resistencia",
+        "Condensador",
+        "Potenciometro",
+        "Conector",
+        "Transformador",
+        "Tanque",
+        "Diodo",
+        "Proteccion",
+        "Interruptor",
+        "Alimentacion",
+        "Cableado"
+      ];
+      const orderedTypes = [
+        ...typeOrder.filter(type => groupedRows[type]),
+        ...Object.keys(groupedRows).filter(type => !typeOrder.includes(type)).sort()
+      ];
+
+      componentStats = { count: rows.length, groups: orderedTypes.length };
+      if (currentStageView === "components") renderMetricsCard();
+      componentGroups.innerHTML = orderedTypes.map(type => `
+        <section class="component-group">
+          <h3 class="component-group-title">${type}</h3>
+          <table class="stage-table">
+            <thead>
+              <tr>
+                <th>Componente</th>
+                <th>Valor / especificacion</th>
+                ${type === "Resistencia" ? "<th>Codigo de colores</th>" : ""}
+                <th>Estado</th>
+                <th>Nota</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${groupedRows[type].map(row => `
+                <tr>
+                  <td>${row.name}</td>
+                  <td>${renderComponentValue(row)}</td>
+                  ${type === "Resistencia" ? `<td>${renderColorCode(row)}</td>` : ""}
+                  <td><span class="status" style="--status-color:${statusColor(row.status)}">${row.status}</span></td>
+                  <td>${row.note}${sharedNote(row)}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </section>
+      `).join("");
+    }
+
+    function selectBlock(id) {
+      selectedFilter = id;
+      if (id === "all") {
+        renderList();
+        renderComponents();
+        return;
+      }
+      activeId = id;
+      renderList();
+      renderZones();
+      renderInfo();
+      renderComponents();
+    }
+
+    function updateSchematicTransform() {
+      schematicCanvas.style.transform = `translate(-50%, -50%) translate(${view.panX}px, ${view.panY}px) scale(${view.scale})`;
+    }
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function zoomAt(clientX, clientY, deltaY) {
+      const rect = schematicViewport.getBoundingClientRect();
+      const oldScale = view.scale;
+      const zoomFactor = deltaY < 0 ? 1.12 : 0.88;
+      const newScale = clamp(oldScale * zoomFactor, view.minScale, view.maxScale);
+      const relX = clientX - rect.left - rect.width / 2;
+      const relY = clientY - rect.top - rect.height * 0.48;
+      const ratio = newScale / oldScale;
+
+      view.panX = relX - (relX - view.panX) * ratio;
+      view.panY = relY - (relY - view.panY) * ratio;
+      view.scale = newScale;
+      updateSchematicTransform();
+    }
+
+    list.addEventListener("click", event => {
+      const button = event.target.closest("[data-id]");
+      if (button) {
+        selectBlock(button.dataset.id);
+        setStageView("components");
+      }
+    });
+
+    viewTabs.forEach(tab => {
+      tab.addEventListener("click", () => setStageView(tab.dataset.stageView));
+    });
+
+    zonesSvg.addEventListener("click", event => {
+      const group = event.target.closest("[data-id]");
+      if (group) selectBlock(group.dataset.id);
+    });
+
+    zonesSvg.addEventListener("mouseover", event => {
+      const group = event.target.closest("[data-id]");
+      if (!group) return;
+      const zone = group.querySelector(".zone");
+      zone.classList.add("is-active");
+    });
+
+    zonesSvg.addEventListener("mouseout", event => {
+      const group = event.target.closest("[data-id]");
+      if (!group || group.dataset.id === activeId) return;
+      const zone = group.querySelector(".zone");
+      zone.classList.remove("is-active");
+    });
+
+    schematicViewport.addEventListener("wheel", event => {
+      event.preventDefault();
+      zoomAt(event.clientX, event.clientY, event.deltaY);
+    }, { passive: false });
+
+    schematicViewport.addEventListener("mousedown", event => {
+      if (event.button !== 1) return;
+      event.preventDefault();
+      view.isPanning = true;
+      view.startX = event.clientX;
+      view.startY = event.clientY;
+      view.startPanX = view.panX;
+      view.startPanY = view.panY;
+      schematicViewport.classList.add("is-panning");
+    });
+
+    window.addEventListener("mousemove", event => {
+      if (!view.isPanning) return;
+      view.panX = view.startPanX + event.clientX - view.startX;
+      view.panY = view.startPanY + event.clientY - view.startY;
+      updateSchematicTransform();
+    });
+
+    window.addEventListener("mouseup", event => {
+      if (event.button !== 1) return;
+      view.isPanning = false;
+      schematicViewport.classList.remove("is-panning");
+    });
+
+    schematicViewport.addEventListener("auxclick", event => {
+      if (event.button === 1) event.preventDefault();
+    });
+
+    renderList();
+    renderZones();
+    renderInfo();
+    renderComponents();
+    setStageView("schematic");
+    updateSchematicTransform();
+  </script>
+</body>
+</html>

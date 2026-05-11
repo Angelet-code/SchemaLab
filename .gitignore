@@ -1,0 +1,18 @@
+# Local/editor noise
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Generated or temporary analysis artifacts
+_analysis_crops/
+AppWeb/No usar/
+*.zip
+
+# Unrelated or explicitly non-reference source material
+Harlequin/
+Otros/
+Hurricane/NOT_MY_AMP_*
+Hurricane/UNVERIFIED_*
+
+# Local preview screenshots and exports
+AppWeb/screen.png

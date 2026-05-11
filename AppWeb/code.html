@@ -1,0 +1,387 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Aeris Dashboard - Technical View</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style data-purpose="custom-fonts">
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+<style data-purpose="glassmorphism">
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+    }
+    .glass-overlay {
+      background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+      pointer-events: none;
+    }
+    .glass-schematic-container {
+      position: relative;
+      background: radial-gradient(circle, rgba(230,240,245,0.8) 0%, rgba(210,225,235,0.5) 100%);
+      border-radius: 2rem;
+      overflow: hidden;
+      box-shadow: inset 0 0 50px rgba(255,255,255,0.5), 0 20px 40px rgba(0,0,0,0.05);
+      border: 1px solid rgba(255,255,255,0.8);
+    }
+    .holographic-glare {
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
+      transform: skewX(-20deg);
+      animation: glare 6s infinite;
+      pointer-events: none;
+    }
+    @keyframes glare {
+      0% { left: -100%; }
+      20% { left: 200%; }
+      100% { left: 200%; }
+    }
+  </style>
+<style data-purpose="custom-scrollbars">
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 0, 0, 0.2);
+    }
+  </style>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'aeris-teal': '#1abc9c',
+            'aeris-teal-dark': '#16a085',
+            'aeris-coral': '#e67e22',
+            'aeris-bg': '#eef2f5',
+            'aeris-text-main': '#2c3e50',
+            'aeris-text-muted': '#7f8c8d',
+            'aeris-border': '#dcdde1',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="text-aeris-text-main h-screen w-screen overflow-hidden flex selection:bg-aeris-teal selection:text-white antialiased" style="background-image: url(&quot;https://lh3.googleusercontent.com/aida/ADBb0uhCo10DAMG5196FeW3Y_5qh4MJipWVzCzqOu05cffrfR87Iyi7-X47xOzfobtJ5-OBV-NtGHnhkeaxMUI554R2V9EjRth8RGT-voNz3P-DbekQRqfndAT3se64cNClE9qoBiFc21OkkGqmOUI-ZzHpH-Z69UzazNamdj3B4OteILqeVpwfZcGQnEMSBZU7koP9IByVqxNJdLk-PDt_eYn_Yoj3LaXXo62tbxhXcbqGQW3S9Ukaq1J9f7NR_PAPtir9wO_SUE6lK_So&quot;); background-size: cover; background-position: center center; background-attachment: fixed;">
+<!-- BEGIN: Main Layout -->
+<div class="flex w-full h-full p-4 gap-4 relative z-10 bg-white/20 backdrop-blur-[2px]">
+<!-- BEGIN: Left Sidebar -->
+<aside class="w-80 flex flex-col gap-4 h-full flex-shrink-0">
+<!-- Brand Header -->
+<div class="glass-panel rounded-2xl p-6 flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-aeris-teal/10 flex items-center justify-center text-aeris-teal">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div>
+<h1 class="text-xl font-bold tracking-widest text-aeris-teal">CORNFORD HURRICANE</h1>
+<p class="text-[10px] uppercase tracking-wider text-aeris-text-muted">Guitar amplifier</p>
+</div>
+</div>
+<!-- Navigation List -->
+<div class="glass-panel rounded-2xl flex-1 overflow-y-auto relative flex flex-col p-4 gap-2">
+<!-- Item 1: Entrada -->
+<button class="w-full text-left p-3 rounded-xl flex items-center gap-4 hover:bg-white/50 transition-colors border border-transparent">
+<div class="w-12 h-12 rounded-full bg-aeris-teal/10 flex items-center justify-center shrink-0">
+<svg class="w-6 h-6 text-aeris-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex-1">
+<h3 class="font-semibold text-sm tracking-wide uppercase">Entrada</h3>
+<p class="text-xs text-aeris-text-muted">Señal de Instrumento</p>
+</div>
+</button>
+<!-- Item 2: Previo Principal (SELECTED) -->
+<button class="w-full text-left p-3 rounded-xl flex items-center gap-4 bg-white shadow-sm border border-aeris-coral relative overflow-hidden group">
+<div class="w-12 h-12 rounded-full bg-aeris-teal/10 flex items-center justify-center shrink-0 border-2 border-aeris-teal">
+<svg class="w-6 h-6 text-aeris-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex-1">
+<h3 class="font-semibold text-sm tracking-wide text-aeris-teal uppercase">Previo Principal</h3>
+<p class="text-xs text-aeris-text-muted">Ganancia y Tono</p>
+</div>
+<div class="absolute right-0 top-0 bottom-0 bg-aeris-teal text-white flex items-center px-1.5 transform group-hover:scale-y-110 transition-transform">
+<span class="text-[9px] font-bold tracking-widest" style="writing-mode: vertical-rl; transform: rotate(180deg);">SELECTED</span>
+</div>
+</button>
+<!-- Item 3: Loop de Efectos -->
+<button class="w-full text-left p-3 rounded-xl flex items-center gap-4 hover:bg-white/50 transition-colors border border-transparent">
+<div class="w-12 h-12 rounded-full bg-aeris-teal/10 flex items-center justify-center shrink-0">
+<svg class="w-6 h-6 text-aeris-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex-1">
+<h3 class="font-semibold text-sm tracking-wide uppercase">Loop de Efectos</h3>
+<p class="text-xs text-aeris-text-muted">Send / Return</p>
+</div>
+</button>
+<!-- Item 4: Etapa Driver -->
+<button class="w-full text-left p-3 rounded-xl flex items-center gap-4 hover:bg-white/50 transition-colors border border-transparent">
+<div class="w-12 h-12 rounded-full bg-aeris-teal/10 flex items-center justify-center shrink-0">
+<svg class="w-6 h-6 text-aeris-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex-1">
+<h3 class="font-semibold text-sm tracking-wide uppercase">Etapa Driver</h3>
+<p class="text-xs text-aeris-text-muted">ECC83 Driver</p>
+</div>
+</button>
+<!-- Item 5: Master -->
+<button class="w-full text-left p-3 rounded-xl flex items-center gap-4 hover:bg-white/50 transition-colors border border-transparent">
+<div class="w-12 h-12 rounded-full bg-aeris-teal/10 flex items-center justify-center shrink-0">
+<svg class="w-6 h-6 text-aeris-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex-1">
+<h3 class="font-semibold text-sm tracking-wide uppercase">Master</h3>
+<p class="text-xs text-aeris-text-muted">Control de Volumen</p>
+</div>
+</button>
+<!-- Item 6: Inversor de Fase -->
+<button class="w-full text-left p-3 rounded-xl flex items-center gap-4 hover:bg-white/50 transition-colors border border-transparent">
+<div class="w-12 h-12 rounded-full bg-aeris-teal/10 flex items-center justify-center shrink-0">
+<svg class="w-6 h-6 text-aeris-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 16V4m0 12l-3-3m3 3l3-3m9-7v12m0-12l3 3m-3-3l-3 3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex-1">
+<h3 class="font-semibold text-sm tracking-wide uppercase">Inversor de Fase</h3>
+<p class="text-xs text-aeris-text-muted">ECC83 Phase Splitter</p>
+</div>
+</button>
+<!-- Item 7: Etapa de Potencia -->
+<button class="w-full text-left p-3 rounded-xl flex items-center gap-4 hover:bg-white/50 transition-colors border border-transparent">
+<div class="w-12 h-12 rounded-full bg-aeris-teal/10 flex items-center justify-center shrink-0">
+<svg class="w-6 h-6 text-aeris-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex-1">
+<h3 class="font-semibold text-sm tracking-wide uppercase">Etapa de Potencia</h3>
+<p class="text-xs text-aeris-text-muted">EL84 Push-Pull</p>
+</div>
+</button>
+<!-- Item 8: Reverb -->
+<button class="w-full text-left p-3 rounded-xl flex items-center gap-4 hover:bg-white/50 transition-colors border border-transparent">
+<div class="w-12 h-12 rounded-full bg-aeris-teal/10 flex items-center justify-center shrink-0">
+<svg class="w-6 h-6 text-aeris-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M11 19a1 1 0 011 1v1M7.5 14.5a1 1 0 011 1v1m8.5-6.5a1 1 0 011 1v1m-1-11a1 1 0 011 1v1m-4.5 1.25l.5.5m-3 3l.5.5m-3 3l.5.5m-3 3l.5.5" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex-1">
+<h3 class="font-semibold text-sm tracking-wide uppercase">Reverb</h3>
+<p class="text-xs text-aeris-text-muted">Circuito de Ambiente</p>
+</div>
+</button>
+<!-- Item 9: Fuente de Alimentación -->
+<button class="w-full text-left p-3 rounded-xl flex items-center gap-4 hover:bg-white/50 transition-colors border border-transparent">
+<div class="w-12 h-12 rounded-full bg-aeris-teal/10 flex items-center justify-center shrink-0">
+<svg class="w-6 h-6 text-aeris-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex-1">
+<h3 class="font-semibold text-sm tracking-wide uppercase">Fuente de Alimentación</h3>
+<p class="text-xs text-aeris-text-muted">Rectificación y Filtrado</p>
+</div>
+</button>
+</div>
+<!-- Footer Widget -->
+<div class="glass-panel rounded-2xl p-4 flex justify-between items-center text-xs font-semibold text-aeris-text-muted">
+<div class="flex items-center gap-2">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          EXPEDITION LOG
+        </div>
+<div class="">12 / 48</div>
+</div>
+</aside>
+<!-- END: Left Sidebar -->
+<!-- BEGIN: Central Content Area -->
+<main class="flex-1 relative flex flex-col min-w-0 bg-transparent"><header class="flex justify-between items-start pt-2 px-8 z-20 absolute top-0 left-0 right-0 pointer-events-none"><div class="pointer-events-auto"><div class="flex items-center gap-3 text-aeris-coral mb-1"><svg class="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg><h2 class="text-4xl font-bold tracking-widest text-aeris-teal uppercase">Schematic View</h2></div><p class="text-sm font-semibold tracking-widest text-aeris-text-muted uppercase">Circuit Diagram</p><div class="mt-4 max-w-md text-sm text-aeris-text-main leading-relaxed font-medium bg-white/60 p-3 rounded-xl backdrop-blur-sm">Technical blueprint for the Cornford Hurricane «Chillidoggy». Displays functional blocks, component values, and signal routing for analysis.</div><div class="flex gap-2 mt-4 text-[10px] font-bold uppercase tracking-wider"><span class="bg-white/80 border border-aeris-border text-aeris-teal px-3 py-1.5 rounded-full flex items-center gap-1 shadow-sm"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg> VERSION #6</span><span class="bg-white/80 border border-aeris-border text-aeris-text-muted px-3 py-1.5 rounded-full flex items-center gap-1 shadow-sm"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012-2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg> 9 BLOCKS</span><span class="bg-white/80 border border-aeris-border text-aeris-teal px-3 py-1.5 rounded-full flex items-center gap-1 shadow-sm"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg> ACTIVE</span></div></div><div class="text-right text-[10px] font-bold tracking-widest text-aeris-text-muted flex flex-col gap-1 pointer-events-auto bg-white/60 p-2 rounded-lg backdrop-blur-sm shadow-sm"><div class="flex items-center justify-end gap-2"><span class="text-aeris-text-main/50">AUTHOR</span> <span class="text-aeris-teal">MARTIN KIDD</span></div><div class="flex items-center justify-end gap-2"><span class="text-aeris-text-main/50">DATE</span> <span class="text-aeris-teal">13/07/01</span></div><div class="flex items-center justify-end gap-2"><span class="text-aeris-text-main/50">REVISION</span> <span class="text-aeris-teal">01/05/2013</span></div></div></header><div class="absolute bottom-6 left-0 right-0 flex justify-center z-20 pointer-events-none"><div class="glass-panel rounded-full p-2 flex items-center gap-2 pointer-events-auto shadow-lg"><button class="px-6 py-2 rounded-full text-sm font-semibold text-aeris-text-main hover:bg-black/5 transition-colors flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg> ANALYZE </button><button class="px-8 py-2.5 rounded-full bg-aeris-teal text-white text-sm font-bold tracking-wide shadow-md hover:bg-aeris-teal-dark transition-colors flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg> CALIBRATE </button><button class="px-6 py-2 rounded-full text-sm font-semibold text-aeris-text-main hover:bg-black/5 transition-colors flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg> EXPORT </button></div></div></main>
+<!-- END: Central Content Area -->
+<!-- BEGIN: Right Sidebar -->
+<aside class="w-96 flex flex-col gap-4 h-full flex-shrink-0 relative z-20">
+<!-- User Profile Profile -->
+<div class="glass-panel rounded-2xl p-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden border-2 border-white shadow-sm">
+<img alt="User Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKZy3CYzsOTGtUqdTMOsLNEeW6EjsLw_eco8Mg5H7h7QwN5RqntqWBKfIcX_9m5RaHER8TtIP_E_I9Lugt4DppdS5NM3cRX04G5kcusNCCYHF4R_GcGXpYldTYU6-KRCwn8KJlMRugba_P4tkeOQqBg17oY6r41JIUm3Zr-XSnP8ti0FL-IswHfnq8GHKv7rEBxuwZvx30gLamKl8RmrV7AWX9DVVzTHO_ZaJLQmqNaYTVKKjb8yH9GjKFaMYPvn98kJ-Si9kj--9a">
+</div>
+<div>
+<h3 class="text-sm font-bold tracking-wide">Ángel Díez</h3>
+<div class="flex items-center gap-2 text-[10px] text-aeris-text-muted font-semibold mt-0.5">
+<span class="">IMPLEMENTATION PROGRESS</span>
+<div class="w-20 h-1 bg-gray-200 rounded-full overflow-hidden">
+<div class="h-full bg-aeris-coral w-2/3"></div>
+</div>
+<span class="">85%</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2 text-aeris-text-muted">
+<button class="p-1.5 hover:text-aeris-text-main transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+<button class="p-1.5 hover:text-aeris-text-main transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+</div>
+</div>
+<!-- Spec Overview Panel -->
+<div class="glass-panel rounded-2xl p-6 flex-1 flex flex-col">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-xs font-bold tracking-widest text-aeris-text-muted uppercase">Tech Specs</h3>
+<div class="w-2 h-2 rounded-full bg-aeris-teal animate-pulse"></div>
+</div>
+<div class="flex flex-col gap-5 flex-1 justify-center">
+<!-- Spec Item -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3 w-1/2">
+<div class="text-aeris-text-muted"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></div>
+<div>
+<div class="text-[10px] font-bold tracking-wider text-aeris-text-muted uppercase mb-1">Power Output</div>
+<div class="flex gap-0.5">
+<div class="w-3 h-1.5 bg-aeris-teal rounded-sm"></div>
+<div class="w-3 h-1.5 bg-aeris-teal rounded-sm"></div>
+<div class="w-3 h-1.5 bg-aeris-teal rounded-sm"></div>
+<div class="w-3 h-1.5 bg-aeris-teal rounded-sm"></div>
+<div class="w-3 h-1.5 bg-aeris-teal rounded-sm opacity-30"></div>
+</div>
+</div>
+</div>
+<div class="text-sm font-bold text-right">20 Watts</div>
+</div>
+<!-- Spec Item -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3 w-1/2">
+<div class="text-aeris-text-muted"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></div>
+<div>
+<div class="text-[10px] font-bold tracking-wider text-aeris-text-muted uppercase mb-1">Tubes</div>
+<div class="flex gap-0.5">
+<div class="w-3 h-1.5 bg-aeris-teal rounded-sm"></div>
+<div class="w-3 h-1.5 bg-aeris-teal rounded-sm"></div>
+<div class="w-3 h-1.5 bg-aeris-teal rounded-sm"></div>
+<div class="w-3 h-1.5 bg-gray-300 rounded-sm"></div>
+<div class="w-3 h-1.5 bg-gray-300 rounded-sm"></div>
+</div>
+</div>
+</div>
+<div class="text-sm font-bold text-right">ECC83 / EL84</div>
+</div>
+<!-- Spec Item -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3 w-1/2">
+<div class="text-aeris-text-muted"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></div>
+<div>
+<div class="text-[10px] font-bold tracking-wider text-aeris-text-muted uppercase mb-1">Transformer</div>
+<div class="flex gap-0.5">
+<div class="w-3 h-1.5 bg-gray-300 rounded-sm"></div>
+<div class="w-3 h-1.5 bg-gray-300 rounded-sm"></div>
+<div class="w-3 h-1.5 bg-gray-300 rounded-sm"></div>
+<div class="w-3 h-1.5 bg-gray-300 rounded-sm"></div>
+<div class="w-3 h-1.5 bg-gray-300 rounded-sm"></div>
+</div>
+</div>
+</div>
+<div class="text-sm font-bold text-right">TECM 323 A</div>
+</div>
+<!-- Spec Item -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3 w-1/2">
+<div class="text-aeris-text-muted"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></div>
+<div>
+<div class="text-[10px] font-bold tracking-wider text-aeris-text-muted uppercase mb-1">Topology</div>
+<div class="flex gap-0.5">
+<div class="w-3 h-1.5 bg-aeris-teal rounded-sm"></div>
+<div class="w-3 h-1.5 bg-aeris-teal rounded-sm"></div>
+<div class="w-3 h-1.5 bg-aeris-teal rounded-sm"></div>
+<div class="w-3 h-1.5 bg-gray-300 rounded-sm"></div>
+<div class="w-3 h-1.5 bg-gray-300 rounded-sm"></div>
+</div>
+</div>
+</div>
+<div class="text-sm font-bold text-right">Push-Pull</div>
+</div>
+<!-- Spec Item -->
+<div class="flex items-center justify-between mt-2 pt-4 border-t border-aeris-border/50">
+<div class="flex items-center gap-3 w-1/2">
+<div class="text-aeris-coral"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></div>
+<div>
+<div class="text-[10px] font-bold tracking-wider text-aeris-text-muted uppercase mb-1">Complexity</div>
+<div class="flex gap-0.5">
+<div class="w-3 h-1.5 bg-aeris-coral rounded-sm"></div>
+<div class="w-3 h-1.5 bg-aeris-coral rounded-sm"></div>
+<div class="w-3 h-1.5 bg-aeris-coral rounded-sm"></div>
+<div class="w-3 h-1.5 bg-gray-300 rounded-sm"></div>
+<div class="w-3 h-1.5 bg-gray-300 rounded-sm"></div>
+</div>
+</div>
+</div>
+<div class="text-sm font-bold text-right">High</div>
+</div>
+</div>
+</div>
+<!-- Highlights & Tasks Panel -->
+<div class="glass-panel rounded-2xl p-6 flex flex-col h-64">
+<h3 class="text-xs font-bold tracking-widest text-aeris-text-muted uppercase mb-4">Diagnostics &amp; Tests</h3>
+<div class="flex-1 overflow-y-auto pr-2 flex flex-col gap-3">
+<!-- Task 1 -->
+<div class="flex items-start gap-4 group cursor-pointer p-2 -mx-2 rounded-lg hover:bg-white/50 transition-colors">
+<div class="w-8 h-8 rounded-full bg-aeris-teal/20 flex items-center justify-center text-aeris-teal shrink-0 mt-1">
+<div class="w-3 h-3 rounded-full border-2 border-current"></div>
+</div>
+<div class="flex-1">
+<h4 class="text-xs font-bold uppercase tracking-wider mb-1">Bias Calibration</h4>
+<p class="text-[11px] text-aeris-text-muted leading-snug">Check bias voltage on EL84 tubes for optimal performance.</p>
+</div>
+<div class="text-aeris-text-muted group-hover:text-aeris-teal transition-colors mt-1">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+<!-- Task 2 -->
+<div class="flex items-start gap-4 group cursor-pointer p-2 -mx-2 rounded-lg hover:bg-white/50 transition-colors">
+<div class="w-8 h-8 rounded-full bg-aeris-coral/20 flex items-center justify-center text-aeris-coral shrink-0 mt-1">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex-1">
+<h4 class="text-xs font-bold uppercase tracking-wider mb-1">Filter Cap Test</h4>
+<p class="text-[11px] text-aeris-text-muted leading-snug">Measure 47uF/450V caps in power supply for ESR and leakage.</p>
+</div>
+<div class="text-aeris-text-muted group-hover:text-aeris-teal transition-colors mt-1">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+<!-- Task 3 -->
+<div class="flex items-start gap-4 group cursor-pointer p-2 -mx-2 rounded-lg hover:bg-white/50 transition-colors">
+<div class="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-500 shrink-0 mt-1">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex-1">
+<h4 class="text-xs font-bold uppercase tracking-wider mb-1">Reverb Circuit</h4>
+<p class="text-[11px] text-aeris-text-muted leading-snug">Verify signal path through the Send/Return ECC83 driver stage.</p>
+</div>
+<div class="text-aeris-text-muted group-hover:text-aeris-teal transition-colors mt-1">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+</div>
+</div>
+<!-- Info Footer -->
+<div class="glass-panel rounded-xl p-3 flex items-start gap-3">
+<div class="text-indigo-400 shrink-0 mt-0.5">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<p class="text-[11px] text-[#5c6ac4] leading-tight pr-6 font-medium">
+          Use the node analyzer tool to inspect specific signal paths on the schematic.
+        </p>
+<button class="absolute top-3 right-3 text-indigo-300 hover:text-indigo-500">
+<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+</aside>
+<!-- END: Right Sidebar -->
+</div>
+<!-- END: Main Layout -->
+
+
+</body></html>

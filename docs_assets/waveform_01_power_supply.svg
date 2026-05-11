@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="260" viewBox="0 0 900 260">
+  <rect width="900" height="260" fill="#ffffff"/>
+  <text x="24" y="34" font-family="Arial" font-size="22" font-weight="700">Fuente: AC, rectificacion y B+ filtrada</text>
+  <line x1="40" y1="125" x2="860" y2="125" stroke="#ddd" stroke-width="2"/>
+  <path d="M40 125 C70 45 100 45 130 125 C160 205 190 205 220 125 C250 45 280 45 310 125 C340 205 370 205 400 125" fill="none" stroke="#2f73d9" stroke-width="4"/>
+  <text x="80" y="222" font-family="Arial" font-size="16" fill="#2f73d9">Secundario AC</text>
+  <path d="M450 125 C480 45 510 45 540 125 C570 45 600 45 630 125 C660 45 690 45 720 125 C750 45 780 45 810 125" fill="none" stroke="#d94848" stroke-width="4"/>
+  <text x="520" y="222" font-family="Arial" font-size="16" fill="#d94848">Rectificada</text>
+  <path d="M450 75 L500 62 L550 69 L600 58 L650 66 L700 57 L750 64 L810 59" fill="none" stroke="#a67318" stroke-width="5"/>
+  <text x="642" y="48" font-family="Arial" font-size="16" fill="#a67318">B+ filtrada con rizado</text>
+</svg>

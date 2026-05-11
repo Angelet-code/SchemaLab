@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="260" viewBox="0 0 900 260">
+  <rect width="900" height="260" fill="#ffffff"/>
+  <text x="24" y="34" font-family="Arial" font-size="22" font-weight="700">Inversor de fase: dos senales opuestas</text>
+  <line x1="40" y1="130" x2="860" y2="130" stroke="#ddd" stroke-width="2"/>
+  <path d="M60 130 C90 65 120 65 150 130 C180 195 210 195 240 130 C270 65 300 65 330 130" fill="none" stroke="#2f73d9" stroke-width="5"/>
+  <text x="125" y="220" font-family="Arial" font-size="16" fill="#2f73d9">Entrada</text>
+  <path d="M470 130 C500 65 530 65 560 130 C590 195 620 195 650 130 C680 65 710 65 740 130 C770 195 800 195 830 130" fill="none" stroke="#36a36a" stroke-width="5"/>
+  <path d="M470 130 C500 195 530 195 560 130 C590 65 620 65 650 130 C680 195 710 195 740 130 C770 65 800 65 830 130" fill="none" stroke="#d94848" stroke-width="5"/>
+  <text x="560" y="220" font-family="Arial" font-size="16" fill="#333">Salidas hacia EL84: 0 grados y 180 grados</text>
+</svg>

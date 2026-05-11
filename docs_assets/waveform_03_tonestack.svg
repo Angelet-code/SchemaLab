@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="260" viewBox="0 0 900 260">
+  <rect width="900" height="260" fill="#ffffff"/>
+  <text x="24" y="34" font-family="Arial" font-size="22" font-weight="700">Tonestack: atenuacion y cambio de balance tonal</text>
+  <line x1="40" y1="130" x2="860" y2="130" stroke="#ddd" stroke-width="2"/>
+  <path d="M70 130 C100 55 130 55 160 130 C190 205 220 205 250 130 C280 55 310 55 340 130" fill="none" stroke="#7a5be0" stroke-width="5"/>
+  <text x="120" y="220" font-family="Arial" font-size="16" fill="#7a5be0">Antes del tonestack</text>
+  <path d="M500 130 C530 88 560 88 590 130 C620 172 650 172 680 130 C710 88 740 88 770 130 C800 172 830 172 860 130" fill="none" stroke="#36a36a" stroke-width="5"/>
+  <text x="590" y="220" font-family="Arial" font-size="16" fill="#36a36a">Despues: menor nivel y curva tonal</text>
+  <path d="M500 72 C560 96 620 110 680 116 C740 122 800 112 860 88" fill="none" stroke="#d94848" stroke-width="3" stroke-dasharray="7 7"/>
+  <text x="610" y="65" font-family="Arial" font-size="15" fill="#d94848">EQ conceptual</text>
+</svg>

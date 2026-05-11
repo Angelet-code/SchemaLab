@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="260" viewBox="0 0 900 260">
+  <rect width="900" height="260" fill="#ffffff"/>
+  <text x="24" y="34" font-family="Arial" font-size="22" font-weight="700">Etapa push-pull: recombinacion en el transformador de salida</text>
+  <line x1="40" y1="130" x2="860" y2="130" stroke="#ddd" stroke-width="2"/>
+  <path d="M60 130 C90 65 120 65 150 130 C180 195 210 195 240 130 C270 65 300 65 330 130" fill="none" stroke="#36a36a" stroke-width="5"/>
+  <path d="M60 130 C90 195 120 195 150 130 C180 65 210 65 240 130 C270 195 300 195 330 130" fill="none" stroke="#d94848" stroke-width="5"/>
+  <text x="86" y="220" font-family="Arial" font-size="16" fill="#333">Dos ramas EL84</text>
+  <path d="M500 130 C535 55 570 55 605 130 C640 205 675 205 710 130 C745 55 780 55 815 130" fill="none" stroke="#222" stroke-width="6"/>
+  <text x="555" y="220" font-family="Arial" font-size="16" fill="#222">Salida reconstruida en secundario OT</text>
+  <rect x="390" y="82" width="55" height="96" fill="none" stroke="#555" stroke-width="3"/>
+  <text x="392" y="72" font-family="Arial" font-size="15" fill="#555">OT</text>
+</svg>

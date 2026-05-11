@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="260" viewBox="0 0 900 260">
+  <rect width="900" height="260" fill="#ffffff"/>
+  <text x="24" y="34" font-family="Arial" font-size="22" font-weight="700">Previo: aumento de nivel y posible saturacion</text>
+  <line x1="40" y1="130" x2="860" y2="130" stroke="#ddd" stroke-width="2"/>
+  <path d="M60 130 C85 105 110 105 135 130 C160 155 185 155 210 130 C235 105 260 105 285 130 C310 155 335 155 360 130" fill="none" stroke="#2f73d9" stroke-width="4"/>
+  <text x="120" y="205" font-family="Arial" font-size="16" fill="#2f73d9">Entrada guitarra</text>
+  <path d="M470 130 C500 55 530 55 560 130 C590 205 620 205 650 130 C680 55 710 55 740 130 C770 205 800 205 830 130" fill="none" stroke="#f29d35" stroke-width="5"/>
+  <line x1="450" y1="58" x2="850" y2="58" stroke="#999" stroke-dasharray="8 8"/>
+  <line x1="450" y1="202" x2="850" y2="202" stroke="#999" stroke-dasharray="8 8"/>
+  <text x="585" y="225" font-family="Arial" font-size="16" fill="#f29d35">Salida previo amplificada</text>
+</svg>
