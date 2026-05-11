@@ -25,7 +25,27 @@
       --shadow: 0 18px 60px rgba(28,49,67,.14);
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    *::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+      display: none;
+    }
+
+    html {
+      overflow-x: hidden;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    html::-webkit-scrollbar {
+      display: none;
+    }
 
     body {
       margin: 0;
@@ -35,6 +55,12 @@
       background:
         linear-gradient(135deg, rgba(237,243,244,.98), rgba(246,249,249,.96));
       overflow: hidden;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    body::-webkit-scrollbar {
+      display: none;
     }
 
     button { font: inherit; }
@@ -835,10 +861,15 @@
     }
 
     @media (max-width: 1180px) {
-      body { overflow: auto; }
+      body {
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
       .app {
         height: auto;
         min-height: 100vh;
+        padding: 12px;
+        gap: 12px;
         grid-template-columns: 1fr;
       }
       .sidebar, .inspector { min-height: auto; }
@@ -856,6 +887,280 @@
         -ms-overflow-style: none;
       }
       .view-switcher::-webkit-scrollbar { display: none; }
+    }
+
+    @media (max-width: 900px) {
+      .block-list {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        scroll-snap-type: x proximity;
+      }
+
+      .nav-item {
+        flex: 0 0 min(230px, 78vw);
+        scroll-snap-align: start;
+      }
+
+      .nav-item:hover,
+      .nav-item.is-active {
+        transform: none;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .app {
+        padding: 10px;
+        gap: 12px;
+      }
+
+      .brand {
+        padding: 16px;
+        gap: 12px;
+      }
+
+      .brand-logo {
+        width: 34px;
+        height: 34px;
+      }
+
+      .brand h1 {
+        font-size: 18px;
+        letter-spacing: .08em;
+      }
+
+      .brand p {
+        font-size: 10px;
+        letter-spacing: .05em;
+      }
+
+      .progress {
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 8px;
+        line-height: 1.35;
+      }
+
+      .block-list {
+        padding: 10px;
+      }
+
+      .nav-item {
+        grid-template-columns: 38px 1fr;
+        padding: 10px 28px 10px 10px;
+      }
+
+      .dot {
+        width: 36px;
+        height: 36px;
+      }
+
+      .stage {
+        min-height: 78vh;
+      }
+
+      .stage-header {
+        padding: 14px 12px 0;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .stage-title-line {
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .stage-title-icon {
+        width: 28px;
+        height: 28px;
+        margin-top: 2px;
+      }
+
+      .stage-title h2 {
+        font-size: clamp(24px, 10vw, 34px);
+        letter-spacing: .10em;
+      }
+
+      .stage-title p {
+        max-width: 32ch;
+        font-size: 11px;
+        letter-spacing: .06em;
+        line-height: 1.35;
+      }
+
+      .revision-card {
+        align-self: flex-start;
+        max-width: 100%;
+        text-align: left;
+        font-size: 9px;
+        letter-spacing: .08em;
+        padding: 7px 9px;
+      }
+
+      .revision-card div {
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        white-space: normal;
+      }
+
+      .stage-data-view {
+        inset: 178px 8px 0;
+      }
+
+      .stage-data-shell {
+        padding-bottom: 118px;
+      }
+
+      .component-groups {
+        gap: 18px;
+      }
+
+      .component-group-title {
+        margin: 0 4px 8px;
+        font-size: 13px;
+        letter-spacing: .09em;
+      }
+
+      .component-type-icon {
+        width: 20px;
+        height: 20px;
+      }
+
+      .stage-table {
+        display: block;
+        min-width: 0;
+        border-spacing: 0;
+      }
+
+      .stage-table thead {
+        display: none;
+      }
+
+      .stage-table tbody {
+        display: grid;
+        gap: 10px;
+      }
+
+      .stage-table tr {
+        display: grid;
+        overflow: hidden;
+        border-radius: 12px;
+        background: rgba(255,255,255,.72);
+        border: 1px solid rgba(255,255,255,.75);
+        backdrop-filter: blur(12px);
+      }
+
+      .stage-table td {
+        display: grid;
+        grid-template-columns: minmax(96px, 34%) 1fr;
+        gap: 10px;
+        align-items: start;
+        padding: 10px 12px;
+        background: transparent;
+        border: 0;
+        border-bottom: 1px solid rgba(16,32,51,.06);
+        font-size: 12px;
+        backdrop-filter: none;
+      }
+
+      .stage-table td:first-child,
+      .stage-table td:last-child {
+        border-radius: 0;
+        border-left: 0;
+        border-right: 0;
+      }
+
+      .stage-table td:last-child {
+        border-bottom: 0;
+      }
+
+      .stage-table td::before {
+        content: attr(data-label);
+        color: var(--muted);
+        font-size: 9px;
+        font-weight: 900;
+        letter-spacing: .12em;
+        line-height: 1.35;
+        text-transform: uppercase;
+      }
+
+      .resistor-code {
+        gap: 6px;
+      }
+
+      .band-label {
+        font-size: 10px;
+      }
+
+      .view-switcher {
+        left: 10px;
+        right: 10px;
+        bottom: 12px;
+        max-width: none;
+        justify-content: flex-start;
+        border-radius: 18px;
+        padding: 6px;
+        transform: none;
+      }
+
+      .view-tab {
+        min-height: 38px;
+        padding: 0 12px;
+        font-size: 12px;
+      }
+
+      .view-tab svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      .profile-card {
+        align-items: flex-start;
+      }
+
+      .implementation-progress {
+        flex-wrap: wrap;
+        white-space: normal;
+      }
+
+      .actions-menu {
+        width: min(210px, calc(100vw - 48px));
+      }
+
+      .info-card {
+        padding: 18px;
+      }
+
+      .info-card h2 {
+        font-size: 24px;
+      }
+
+      .section {
+        padding: 16px;
+      }
+
+      .row {
+        font-size: 12px;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .brand h1 {
+        font-size: 16px;
+        letter-spacing: .06em;
+      }
+
+      .stage-title h2 {
+        letter-spacing: .06em;
+      }
+
+      .stage-data-view {
+        inset: 184px 6px 0;
+      }
+
+      .view-tab {
+        padding: 0 10px;
+      }
     }
   </style>
 </head>
@@ -922,13 +1227,13 @@
               </tr>
             </thead>
             <tbody>
-              <tr><td>Esquema v6</td><td><span class="status" style="--status-color:var(--green)">Confirmado</span></td><td>Usarlo como referencia principal frente a layouts antiguos.</td></tr>
-              <tr><td>Mapa de bloques</td><td><span class="status" style="--status-color:var(--green)">v1 listo</span></td><td>Refinar zonas interactivas según vayamos estudiando el circuito.</td></tr>
-              <tr><td>Transformadores reales</td><td><span class="status" style="--status-color:var(--green)">Leídos</span></td><td>Documentar medidas en frío de primarios/secundarios.</td></tr>
-              <tr><td>Transformador alimentación</td><td><span class="status" style="--status-color:var(--red)">Decisión</span></td><td>Comprar PT nuevo o rediseñar fuente para 325 V AC.</td></tr>
-              <tr><td>Cadena B+</td><td><span class="status" style="--status-color:var(--red)">Corregir</span></td><td>Montar A - 2k2/3W - B - 10k - C - 1k - D - 10k - E.</td></tr>
-              <tr><td>Mediciones en frío</td><td><span class="status" style="--status-color:var(--orange)">Pendiente</span></td><td>Identificar nodos A, B, C, D y E en el montaje real.</td></tr>
-              <tr><td>Primer encendido</td><td><span class="status" style="--status-color:var(--red)">Bloqueado</span></td><td>Esperar a corregir fuente, masas, zócalos y procedimiento de seguridad.</td></tr>
+              <tr><td data-label="Área">Esquema v6</td><td data-label="Estado"><span class="status" style="--status-color:var(--green)">Confirmado</span></td><td data-label="Siguiente acción">Usarlo como referencia principal frente a layouts antiguos.</td></tr>
+              <tr><td data-label="Área">Mapa de bloques</td><td data-label="Estado"><span class="status" style="--status-color:var(--green)">v1 listo</span></td><td data-label="Siguiente acción">Refinar zonas interactivas según vayamos estudiando el circuito.</td></tr>
+              <tr><td data-label="Área">Transformadores reales</td><td data-label="Estado"><span class="status" style="--status-color:var(--green)">Leídos</span></td><td data-label="Siguiente acción">Documentar medidas en frío de primarios/secundarios.</td></tr>
+              <tr><td data-label="Área">Transformador alimentación</td><td data-label="Estado"><span class="status" style="--status-color:var(--red)">Decisión</span></td><td data-label="Siguiente acción">Comprar PT nuevo o rediseñar fuente para 325 V AC.</td></tr>
+              <tr><td data-label="Área">Cadena B+</td><td data-label="Estado"><span class="status" style="--status-color:var(--red)">Corregir</span></td><td data-label="Siguiente acción">Montar A - 2k2/3W - B - 10k - C - 1k - D - 10k - E.</td></tr>
+              <tr><td data-label="Área">Mediciones en frío</td><td data-label="Estado"><span class="status" style="--status-color:var(--orange)">Pendiente</span></td><td data-label="Siguiente acción">Identificar nodos A, B, C, D y E en el montaje real.</td></tr>
+              <tr><td data-label="Área">Primer encendido</td><td data-label="Estado"><span class="status" style="--status-color:var(--red)">Bloqueado</span></td><td data-label="Siguiente acción">Esperar a corregir fuente, masas, zócalos y procedimiento de seguridad.</td></tr>
             </tbody>
           </table>
         </div>
@@ -1227,12 +1532,14 @@
         subtitle: "Estado de reconstrucción y siguientes acciones"
       }
     };
+    const compactViewport = window.matchMedia("(max-width: 760px)").matches;
+    const narrowViewport = window.matchMedia("(max-width: 1180px)").matches;
     const view = {
-      scale: 0.78,
-      minScale: 0.48,
+      scale: compactViewport ? 0.42 : narrowViewport ? 0.58 : 0.78,
+      minScale: compactViewport ? 0.30 : narrowViewport ? 0.38 : 0.48,
       maxScale: 2.8,
       panX: 0,
-      panY: 8,
+      panY: compactViewport ? -240 : narrowViewport ? -170 : 8,
       isPanning: false,
       startX: 0,
       startY: 0,
@@ -1625,11 +1932,11 @@
             <tbody>
               ${groupedRows[type].map(row => `
                 <tr>
-                  <td>${row.name}</td>
-                  <td>${renderComponentValue(row)}</td>
-                  ${type === "Resistencia" ? `<td>${renderColorCode(row)}</td>` : ""}
-                  <td><span class="status" style="--status-color:${statusColor(row.status)}">${row.status}</span></td>
-                  <td>${row.note}${sharedNote(row)}</td>
+                  <td data-label="Componente">${row.name}</td>
+                  <td data-label="Valor">${renderComponentValue(row)}</td>
+                  ${type === "Resistencia" ? `<td data-label="Código">${renderColorCode(row)}</td>` : ""}
+                  <td data-label="Estado"><span class="status" style="--status-color:${statusColor(row.status)}">${row.status}</span></td>
+                  <td data-label="Nota">${row.note}${sharedNote(row)}</td>
                 </tr>
               `).join("")}
             </tbody>
