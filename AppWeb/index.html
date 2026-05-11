@@ -209,6 +209,7 @@
     }
 
     .profile-card {
+      position: relative;
       padding: 16px;
       display: flex;
       align-items: center;
@@ -280,6 +281,7 @@
       align-items: center;
       gap: 6px;
       color: var(--muted);
+      position: relative;
     }
 
     .icon-button {
@@ -298,6 +300,51 @@
     .icon-button:hover {
       color: var(--ink);
       background: rgba(16,32,51,.06);
+    }
+
+    .actions-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      width: 210px;
+      padding: 8px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(255,255,255,.88);
+      box-shadow: 0 18px 50px rgba(28,49,67,.16);
+      backdrop-filter: blur(18px);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-4px);
+      transition: opacity .16s ease, transform .16s ease;
+      z-index: 60;
+    }
+
+    .actions-menu.is-open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .menu-link {
+      min-height: 40px;
+      padding: 0 12px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      transition: background .18s ease, color .18s ease;
+    }
+
+    .menu-link:hover {
+      color: var(--teal);
+      background: rgba(20,184,154,.10);
     }
 
     .stage {
@@ -884,25 +931,28 @@
     </main>
 
     <aside class="inspector">
-      <section class="panel profile-card" aria-label="Implementation progress">
+      <section class="panel profile-card" aria-label="Progreso del proyecto">
         <div class="profile-main">
-          <div class="avatar" aria-hidden="true">AD</div>
+          <div class="avatar" aria-hidden="true">CH</div>
           <div>
-            <h3>&Aacute;ngel D&iacute;ez</h3>
+            <h3>Cornford Hurricane</h3>
             <div class="implementation-progress">
-              <span>Implementation Progress</span>
+              <span>PROGRESO</span>
               <div class="progress-track" aria-hidden="true"><div class="progress-fill"></div></div>
               <span>85%</span>
             </div>
           </div>
         </div>
         <div class="profile-actions">
-          <button class="icon-button" type="button" aria-label="Notificaciones">
-            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0 1 18 14.158V11a6.002 6.002 0 0 0-4-5.659V5a2 2 0 1 0-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 1 1-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
-          </button>
-          <button class="icon-button" type="button" aria-label="Menu">
+          <button class="icon-button" id="projectMenuButton" type="button" aria-label="Abrir menu del proyecto" aria-expanded="false" aria-controls="projectMenu">
             <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
           </button>
+          <div class="actions-menu" id="projectMenu" role="menu" aria-label="Acciones del proyecto">
+            <a class="menu-link" role="menuitem" href="assets/schematic-original.jpg" download="Cornford-Hurricane-Chillidoggy-v6-schematic.jpg">
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-1M8 12l4 4m0 0 4-4m-4 4V4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+              Descargar esquema
+            </a>
+          </div>
         </div>
       </section>
       <section class="panel info-card" id="infoCard"></section>
@@ -1123,6 +1173,8 @@
     const stageTitleIcon = document.getElementById("stageTitleIcon");
     const stageSubtitle = document.getElementById("stageSubtitle");
     const metricsCard = document.getElementById("metricsCard");
+    const projectMenuButton = document.getElementById("projectMenuButton");
+    const projectMenu = document.getElementById("projectMenu");
     const centerViews = document.querySelectorAll("[data-view]");
     const viewTabs = document.querySelectorAll("[data-stage-view]");
     let activeId = "previo";
@@ -1594,6 +1646,24 @@
 
     viewTabs.forEach(tab => {
       tab.addEventListener("click", () => setStageView(tab.dataset.stageView));
+    });
+
+    function setProjectMenu(open) {
+      projectMenu.classList.toggle("is-open", open);
+      projectMenuButton.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+
+    projectMenuButton.addEventListener("click", event => {
+      event.stopPropagation();
+      setProjectMenu(!projectMenu.classList.contains("is-open"));
+    });
+
+    document.addEventListener("click", event => {
+      if (!event.target.closest(".profile-actions")) setProjectMenu(false);
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") setProjectMenu(false);
     });
 
     zonesSvg.addEventListener("click", event => {
